@@ -54,11 +54,11 @@ Now that you're in the console, let's test out the all command! Running all from
 	
 If you want to focus in on a particular subset of your tests, like units, functionals, or integration, just enter that keyword:
 
-         > units
+	> units
          
-         > functionals
+	> functionals
          
-         > integration
+	> integration
          
 You can also focus in on just the tests in a given filename by entering a test file name into tconsole:
 

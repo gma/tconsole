@@ -56,6 +56,8 @@ module TConsole
           return false
         elsif line == "reload"
           return true
+        elsif line == "help"
+          help
         elsif line == "units"
           run_tests(["test/unit/**/*_test.rb"])
         elsif line == "functionals"
@@ -93,6 +95,20 @@ module TConsole
 
       puts
       puts "Test time (including load): #{time}s"
+      puts
+    end
+
+    # Returns a list of available commands
+    def self.help
+      puts
+      puts "Available commands:"
+      puts
+      puts "all          # Run all test types (units, functionals, integration)"
+      puts "units        # Run unit tests"
+      puts "functionals  # Run functional tests"
+      puts "integration  # Run integration tests"
+      puts "reload       # Reload your Rails environment"
+      puts "exit         # Exit the console"
       puts
     end
   end

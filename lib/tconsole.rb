@@ -98,7 +98,7 @@ module TConsole
       puts
     end
 
-    # Returns a list of available commands
+    # Prints a list of available commands
     def self.help
       puts
       puts "Available commands:"

@@ -1,3 +1,3 @@
 module TConsole
-  VERSION = "0.0.1-beta"
+  VERSION = "0.0.1.pre"
 end

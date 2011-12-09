@@ -107,6 +107,7 @@ module TConsole
       puts "units        # Run unit tests"
       puts "functionals  # Run functional tests"
       puts "integration  # Run integration tests"
+      puts "[filename]   # Run the tests contained in the given file"
       puts "reload       # Reload your Rails environment"
       puts "exit         # Exit the console"
       puts

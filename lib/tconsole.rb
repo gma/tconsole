@@ -33,7 +33,7 @@ module TConsole
     def self.run_environment(write)
 
       puts
-      puts "Loading Ruby environment..."
+      puts "Loading Rails environment..."
       time = Benchmark.realtime do
         # Ruby environment loading is shamelessly borrowed from spork
         ENV["RAILS_ENV"] ||= "test"

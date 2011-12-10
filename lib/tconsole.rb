@@ -39,8 +39,8 @@ module TConsole
         ENV["RAILS_ENV"] ||= "test"
         $:.unshift("./test")
 
-        if File.exist?("./config/application")
-          require "./config/application"
+        if File.exist?("./config/application.rb")
+          require "./config/application.rb"
         else
           puts "Error: Can't load your Rails environment. Are you sure you're in the root of a Rails project?"
           return false

@@ -35,18 +35,17 @@ module TConsole
       puts
       puts "Loading Rails environment..."
       time = Benchmark.realtime do
-        # Ruby environment loading is shamelessly borrowed from spork
-        ENV["RAILS_ENV"] ||= "test"
-        $:.unshift("./test")
+        begin
+          # Ruby environment loading is shamelessly borrowed from spork
+          ENV["RAILS_ENV"] ||= "test"
+          $:.unshift("./test")
 
-        if File.exist?("./config/application.rb")
           require "./config/application.rb"
-        else
+          ::Rails.application
+        rescue Exception
           puts "Error: Can't load your Rails environment. Are you sure you're in the root of a Rails project?"
           return false
         end
-
-        ::Rails.application
       end
 
       puts "Environment loaded in #{time}s."

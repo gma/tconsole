@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require "tconsole"
+require File.join(File.dirname(__FILE__), "..", "lib", "tconsole")
 
 TConsole::Runner.run

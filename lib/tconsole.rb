@@ -8,6 +8,7 @@ module TConsole
     # Spawns a new environment. Looks at the results of the environment to determine whether to stop or
     # keep running
     def self.run
+
       running = true
 
       while running
@@ -40,9 +41,6 @@ module TConsole
           ENV["RAILS_ENV"] ||= "test"
           $:.unshift("./test")
 
-          #require "./config/application.rb"
-          #::Rails.application
-
           require 'rake'
           Rake.application.init
           Rake.application.load_rakefile
@@ -59,8 +57,6 @@ module TConsole
 
       # Store the state of the terminal
       stty_save = `stty -g`.chomp
-      #trap('INT') { system('stty', stty_save); exit }
-
 
       while line = Readline.readline('> ', true)
         if line == "exit"

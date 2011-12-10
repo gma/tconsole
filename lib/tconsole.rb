@@ -40,10 +40,16 @@ module TConsole
           ENV["RAILS_ENV"] ||= "test"
           $:.unshift("./test")
 
-          require "./config/application.rb"
-          ::Rails.application
-        rescue Exception
-          puts "Error: Can't load your Rails environment. Are you sure you're in the root of a Rails project?"
+          #require "./config/application.rb"
+          #::Rails.application
+
+          require 'rake'
+          Rake.application.init
+          Rake.application.load_rakefile
+          Rake.application.invoke_task("test:prepare")
+        rescue Exception => e
+          puts "Error: Loading your environment failed."
+          puts "    #{e.message}"
           return false
         end
       end

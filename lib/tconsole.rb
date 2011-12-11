@@ -9,20 +9,17 @@ module TConsole
     # keep running
     def self.run
 
+      # We're only going to handle interrupts on the inner process
+      trap("SIGINT") { }
       running = true
 
       while running
-        read, write = IO.pipe
         pid = fork do
-          response = run_environment(write)
-          write.puts [Marshal.dump(response)].pack("m")
+          exit run_environment ? 0 : 1
         end
-        write.close
 
-        response = read.read
-        Process.wait2(pid)
-        running = Marshal.load(response.unpack("m")[0])
-        read.close
+        pid, status = Process.wait2(pid)
+        running = false if status.exitstatus != 0
       end
 
       puts
@@ -31,7 +28,7 @@ module TConsole
 
     # Starts our Rails environment and listens for console commands
     # Returns true if we should keep running or false if we need to exit
-    def self.run_environment(write)
+    def self.run_environment
 
       puts
       puts "Loading Rails environment..."

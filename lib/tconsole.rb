@@ -8,12 +8,16 @@ module TConsole
     # Spawns a new environment. Looks at the results of the environment to determine whether to stop or
     # keep running
     def self.run
-
       stty_save = `stty -g`.chomp
 
       # We're only going to handle interrupts on the inner process
       trap("SIGINT", "IGNORE");
       running = true
+
+      # A little welcome
+      puts
+      puts "Welcome to tconsole. Type 'help' for help."
+      puts "Press ^C or type 'exit' to quit."
 
       while running
         pid = fork do
@@ -57,7 +61,7 @@ module TConsole
       puts "Environment loaded in #{time}s."
       puts
 
-      while line = Readline.readline('> ', true)
+      while line = Readline.readline('tconsole> ', true)
         if line == "exit"
           return false
         elsif line == "reload"

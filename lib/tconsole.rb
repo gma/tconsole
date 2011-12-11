@@ -9,8 +9,10 @@ module TConsole
     # keep running
     def self.run
 
+      stty_save = `stty -g`.chomp
+
       # We're only going to handle interrupts on the inner process
-      trap("SIGINT") { }
+      trap("SIGINT", "IGNORE");
       running = true
 
       while running
@@ -24,11 +26,14 @@ module TConsole
 
       puts
       puts "Exiting. Bye!"
+      system("stty", stty_save);
     end
 
     # Starts our Rails environment and listens for console commands
     # Returns true if we should keep running or false if we need to exit
     def self.run_environment
+
+      trap("SIGINT", "SYSTEM_DEFAULT");
 
       puts
       puts "Loading Rails environment..."
@@ -52,9 +57,6 @@ module TConsole
       puts "Environment loaded in #{time}s."
       puts
 
-      # Store the state of the terminal
-      stty_save = `stty -g`.chomp
-
       while line = Readline.readline('> ', true)
         if line == "exit"
           return false
@@ -74,6 +76,8 @@ module TConsole
           run_tests([line])
         end
       end
+
+      return false
     end
 
     # Taks an array of globs and loads all of the files in the globs
@@ -81,6 +85,10 @@ module TConsole
     def self.run_tests(globs)
       time = Benchmark.realtime do
         pid = fork do
+
+          # Interrupting during a test run won't exit the console, just the test run
+          trap("SIGINT") { puts; puts "Interrupted. Stopping tests."; puts; exit(1); }
+
           puts "Running tests..."
           puts
 

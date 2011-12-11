@@ -86,9 +86,6 @@ module TConsole
       time = Benchmark.realtime do
         pid = fork do
 
-          # Interrupting during a test run won't exit the console, just the test run
-          trap("SIGINT") { puts; puts "Interrupted. Stopping tests."; puts; exit(1); }
-
           puts "Running tests..."
           puts
 

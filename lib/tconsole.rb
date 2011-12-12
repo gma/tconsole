@@ -20,9 +20,20 @@ module TConsole
       puts "Press ^C or type 'exit' to quit."
 
       while running
+        read, write = IO.pipe
         pid = fork do
-          exit run_environment ? 0 : 1
+          write.close
+          exit run_environment(read) ? 0 : 1
+          read.close
         end
+
+        read.close
+
+        while line = Readline.readline("tconsole>", true)
+          write.puts(line)
+        end
+
+        write.close
 
         pid, status = Process.wait2(pid)
         running = false if status.exitstatus != 0
@@ -35,7 +46,7 @@ module TConsole
 
     # Starts our Rails environment and listens for console commands
     # Returns true if we should keep running or false if we need to exit
-    def self.run_environment
+    def self.run_environment(read)
 
       trap("SIGINT", "SYSTEM_DEFAULT");
 
@@ -61,24 +72,10 @@ module TConsole
       puts "Environment loaded in #{time}s."
       puts
 
-      while line = Readline.readline('tconsole> ', true)
-        if line == "exit"
-          return false
-        elsif line == "reload"
-          return true
-        elsif line == "help"
-          help
-        elsif line == "units"
-          run_tests(["test/unit/**/*_test.rb"])
-        elsif line == "functionals"
-          run_tests(["test/functional/**/*_test.rb"])
-        elsif line == "integration"
-          run_tests(["test/integration/**/*_test.rb"])
-        elsif line == "all"
-          run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"])
-        else
-          run_tests([line])
-        end
+      while line = read.read
+        result = process_command(line)
+
+        return false if !result
       end
 
       return false
@@ -113,6 +110,30 @@ module TConsole
       puts
       puts "Test time (including load): #{time}s"
       puts
+    end
+
+    # Processes a command that was submitted
+    # Returns false if the command would cause us to exit, true otherwise
+    def process_command(line)
+      if line == "exit"
+        return false
+      elsif line == "reload"
+        return true
+      elsif line == "help"
+        help
+      elsif line == "units"
+        run_tests(["test/unit/**/*_test.rb"])
+      elsif line == "functionals"
+        run_tests(["test/functional/**/*_test.rb"])
+      elsif line == "integration"
+        run_tests(["test/integration/**/*_test.rb"])
+      elsif line == "all"
+        run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"])
+      else
+        run_tests([line])
+      end
+
+      return true
     end
 
     # Prints a list of available commands

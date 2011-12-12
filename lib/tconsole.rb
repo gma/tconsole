@@ -101,6 +101,10 @@ module TConsole
           paths.each do |path|
             require File.realpath(path)
           end
+
+          if defined? ActiveRecord
+            ActiveRecord::Base.connection.reconnect!
+          end
         end
 
         Process.wait2(pid)

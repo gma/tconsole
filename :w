@@ -14,55 +14,35 @@ module TConsole
     def self.run
       stty_save = `stty -g`.chomp
 
+      # We're only going to handle interrupts on the inner process
       running = true
-      trap("SIGINT", "SYSTEM_DEFAULT")
+      trap("SIGINT", "IGNORE");
 
       # A little welcome
       puts
-      puts "Welcome to tconsole. Type 'help' for help or 'exit' to quit."
+      puts "Welcome to tconsole. Type 'help' for help."
+      puts "Press ^C or type 'exit' to quit."
 
       # Start the server
       while running
-        # ignore ctrl-c during load, since things can get kind of messy if we don't
-
+        puts "Starting Server"
         pid = fork do
-          begin
-            server = Server.new
+          server = Server.new
 
-            DRb.start_service(SERVER_URI, server)
+          DRb.start_service(SERVER_URI, server)
 
-            DRb.thread.join
-          rescue Interrupt
-            # do nothing here since the outer process will shut things down for us
-          end
+          DRb.thread.join
         end
 
         # Set up our client connection to the server
         server = DRbObject.new_with_uri(SERVER_URI)
 
-        loaded = false
-        wait_until = Time.now + 10
-        until loaded || Time.now > wait_until
-          begin
-            running = server.load_environment
-            loaded = true
-          rescue
-            loaded = false
-          rescue Interrupt
-            # do nothing if we get an interrupt
-            puts "Interrupted in client"
-          end
-        end
-
-        if !loaded
-          puts
-          puts "Couldn't connect to test environment. Exiting."
-          exit(1)
-        end
+        running = server.load_environment
 
         running = command_loop(server) if running
 
         server.stop
+        puts "Service stopped. Waiting."
         Process.wait2(pid)
       end
 

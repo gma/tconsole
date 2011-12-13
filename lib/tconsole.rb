@@ -1,10 +1,14 @@
 require "tconsole/version"
+require "tconsole/server"
 
-require 'readline'
-require 'benchmark'
+require "readline"
+require "benchmark"
+require "drb/drb"
 
 module TConsole
   class Runner
+
+    SERVER_URI = "druby://localhost:8788" 
     # Spawns a new environment. Looks at the results of the environment to determine whether to stop or
     # keep running
     def self.run
@@ -19,21 +23,26 @@ module TConsole
       puts "Welcome to tconsole. Type 'help' for help."
       puts "Press ^C or type 'exit' to quit."
 
+      # Start the server
       while running
-        read, write = IO.pipe
         pid = fork do
-          write.close
-          exit run_environment(read) ? 0 : 1
-          read.close
+          server = Server.new
+
+          DRb.start_service(SERVER_URI, server)
+
+          DRb.thread.join
         end
 
-        read.close
+        # Set up our client connection to the server
+        server = DRbObject.new_with_uri(SERVER_URI)
 
         while line = Readline.readline("tconsole>", true)
-          write.puts(line)
+          if line == "exit"
+            exit
+          else
+            puts ">> #{server.run_command(line)}"
+          end
         end
-
-        write.close
 
         pid, status = Process.wait2(pid)
         running = false if status.exitstatus != 0

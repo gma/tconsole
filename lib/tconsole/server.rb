@@ -93,6 +93,7 @@ module TConsole
       end.flatten.compact
     end
 
+    # Based on the code from rake test:uncommitted in Rails
     def run_uncommitted
       if File.directory?(".svn")
         changed_since_checkin = silence_stderr { `svn status` }.split.map { |path| path.chomp[7 .. -1] }

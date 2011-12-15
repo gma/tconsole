@@ -87,6 +87,8 @@ module TConsole
           server.run_tests(["test/functional/**/*_test.rb"])
         elsif line == "integration"
           server.run_tests(["test/integration/**/*_test.rb"])
+        elsif line == "recent"
+          server.run_recent
         elsif line == "all"
           server.run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"])
         else

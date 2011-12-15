@@ -60,7 +60,7 @@ module TConsole
     end
 
     # This code is from the rails test:recents command
-    def run_recents
+    def run_recent
       touched_since = Time.now - 600 # 10 minutes ago
       files = recent_files(touched_since, "app/models/**/*.rb", "test/unit")
       files.concat(recent_files(touched_since, "app/controllers/**/*.rb", "test/functional"))

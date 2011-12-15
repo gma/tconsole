@@ -58,5 +58,38 @@ module TConsole
       puts "Test time (including load): #{time}s"
       puts
     end
+
+    # This code is from the rails test:recents command
+    def run_recents
+      touched_since = Time.now - 600 # 10 minutes ago
+      files = recent_files(touched_since, "app/models/**/*.rb", "test/unit")
+      files.concat(recent_files(touched_since, "app/controllers/**/*.rb", "test/functional"))
+
+      run_tests(files)
+    end
+
+    def recent_files(touched_since, source_pattern, test_path)
+      Dir.glob(source_pattern).map do |path|
+        if File.mtime(path) > touched_since
+          tests = []
+          source_dir = File.dirname(path).split("/")
+          source_file = File.basename(path, '.rb')
+
+          # Support subdirs in app/models and app/controllers
+          modified_test_path = source_dir.length > 2 ? "#{test_path}/" << source_dir[1..source_dir.length].join('/') : test_path
+
+          # For modified files in app/ run the tests for it. ex. /test/functional/account_controller.rb
+          test = "#{modified_test_path}/#{source_file}_test.rb"
+          tests.push test if File.exist?(test)
+
+          # For modified files in app, run tests in subdirs too. ex. /test/functional/account/*_test.rb
+          test = "#{modified_test_path}/#{File.basename(path, '.rb').sub("_controller","")}"
+          File.glob("#{test}/*_test.rb").each { |f| tests.push f } if File.exist?(test)
+
+          return tests
+
+        end
+      end.flatten.compact
+    end
   end
 end

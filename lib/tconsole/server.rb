@@ -46,6 +46,16 @@ module TConsole
             require File.realpath(path)
           end
 
+          if defined?(MiniTest)
+            # Do minitest specific stuff here
+          elsif defined?(Test::Unit)
+            puts "Sorry, but tconsole doesn't support Test::Unit yet"
+            return
+          elsif defined?(RSpec)
+            puts "Sorry, but tconsole doesn't support RSpec yet"
+            return
+          end
+
           if defined? ActiveRecord
             ActiveRecord::Base.connection.reconnect!
           end

@@ -65,7 +65,7 @@ module TConsole
       files = recent_files(touched_since, "app/models/**/*.rb", "test/unit")
       files.concat(recent_files(touched_since, "app/controllers/**/*.rb", "test/functional"))
 
-      message = "Testing #{files.length} changed #{files.length == 1 ? "file" : "files"}..."
+      message = "Running #{files.length} #{files.length == 1 ? "test file" : "test files"} based on changed files..."
       run_tests(files, message)
     end
 
@@ -91,6 +91,27 @@ module TConsole
 
         end
       end.flatten.compact
+    end
+
+    def run_uncommitted
+      if File.directory?(".svn")
+        changed_since_checkin = silence_stderr { `svn status` }.split.map { |path| path.chomp[7 .. -1] }
+      elsif File.directory?(".git")
+        changed_since_checkin = silence_stderr { `git ls-files --modified --others` }.split.map { |path| path.chomp }
+      else
+        puts "Not a Subversion or Git checkout."
+        return
+      end
+
+      models      = changed_since_checkin.select { |path| path =~ /app[\\\/]models[\\\/].*\.rb$/ }
+      controllers = changed_since_checkin.select { |path| path =~ /app[\\\/]controllers[\\\/].*\.rb$/ }
+
+      unit_tests       = models.map { |model| "test/unit/#{File.basename(model, '.rb')}_test.rb" }
+      functional_tests = controllers.map { |controller| "test/functional/#{File.basename(controller, '.rb')}_test.rb" }
+      files = (unit_tests + functional_tests).uniq.select { |file| File.exist?(file) }
+
+      message = "Running #{files.length} #{files.length == 1 ? "test file" : "test files"} based on uncommitted changes..."
+      run_tests(files, message)
     end
   end
 end

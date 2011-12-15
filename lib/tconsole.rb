@@ -89,6 +89,8 @@ module TConsole
           server.run_tests(["test/integration/**/*_test.rb"])
         elsif line == "recent"
           server.run_recent
+        elsif line == "uncommitted"
+          server.run_uncommitted
         elsif line == "all"
           server.run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"])
         else
@@ -109,6 +111,7 @@ module TConsole
       puts "functionals  # Run functional tests"
       puts "integration  # Run integration tests"
       puts "recent       # Run tests for recently changed files"
+      puts "uncommitted  # Run tests for uncommitted changes"
       puts "[filename]   # Run the tests contained in the given file"
       puts "reload       # Reload your Rails environment"
       puts "exit         # Exit the console"

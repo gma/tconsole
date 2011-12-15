@@ -25,7 +25,7 @@ module TConsole
       while running
         # ignore ctrl-c during load, since things can get kind of messy if we don't
 
-        pid = fork do
+        fork do
           begin
             server = Server.new
 
@@ -63,7 +63,7 @@ module TConsole
         running = command_loop(server) if running
 
         server.stop
-        Process.wait2(pid)
+        Process.waitall
       end
 
       puts
@@ -108,6 +108,7 @@ module TConsole
       puts "units        # Run unit tests"
       puts "functionals  # Run functional tests"
       puts "integration  # Run integration tests"
+      puts "recent       # Run tests for recently changed files"
       puts "[filename]   # Run the tests contained in the given file"
       puts "reload       # Reload your Rails environment"
       puts "exit         # Exit the console"

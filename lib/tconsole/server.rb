@@ -30,11 +30,11 @@ module TConsole
       return true
     end
 
-    def run_tests(globs)
+    def run_tests(globs, message = "Running tests...")
       time = Benchmark.realtime do
-        pid = fork do
+        fork do
 
-          puts "Running tests..."
+          puts message
           puts
 
           paths = []
@@ -51,7 +51,7 @@ module TConsole
           end
         end
 
-        Process.wait2(pid)
+        Process.waitall
       end
 
       puts
@@ -65,7 +65,8 @@ module TConsole
       files = recent_files(touched_since, "app/models/**/*.rb", "test/unit")
       files.concat(recent_files(touched_since, "app/controllers/**/*.rb", "test/functional"))
 
-      run_tests(files)
+      message = "Testing #{files.length} changed #{files.length == 1 ? "file" : "files"}..."
+      run_tests(files, message)
     end
 
     def recent_files(touched_since, source_pattern, test_path)

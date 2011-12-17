@@ -46,21 +46,20 @@ module TConsole
             require File.realpath(path)
           end
 
-          if defined?(MiniTest)
-            require File.join(File.dirname(__FILE__), "minitest")
+          if defined? ActiveRecord
+            ActiveRecord::Base.connection.reconnect!
+          end
 
-            MiniTest::Unit.runner.run
-            MiniTestHandler.patch_minitest
+          if defined?(MiniTest)
+            require File.join(File.dirname(__FILE__), "minitest_handler")
+
+            MiniTestHandler.run({:test_pattern => "test_that_name_is_required"})
           elsif defined?(Test::Unit)
             puts "Sorry, but tconsole doesn't support Test::Unit yet"
             return
           elsif defined?(RSpec)
             puts "Sorry, but tconsole doesn't support RSpec yet"
             return
-          end
-
-          if defined? ActiveRecord
-            ActiveRecord::Base.connection.reconnect!
           end
         end
 

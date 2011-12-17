@@ -1,5 +1,17 @@
 module TConsole
   class MiniTestHandler
+    def self.run(options)
+      if options[:test_pattern]
+        args = ["--name", options[:test_pattern]]
+      else
+        args = []
+      end
+
+      MiniTest::Unit.runner.run(args)
+
+      patch_minitest
+    end
+
     # We're basically breaking MiniTest autorun here, since we want to manually run our
     # tests and Rails relies on autorun
     #
@@ -10,11 +22,7 @@ module TConsole
       MiniTest::Unit.class_eval do
         alias_method :old_run, :run
         def run(args = [])
-          @@already_ran ||= true
-          unless @@already_ran
-            old_run(options)
-          end
-          @@already_ran = true
+          # do nothing
         end
       end
     end

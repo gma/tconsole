@@ -1,4 +1,5 @@
 require "tconsole/version"
+require "tconsole/minitest"
 require "tconsole/server"
 
 require "readline"

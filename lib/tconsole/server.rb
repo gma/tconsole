@@ -47,7 +47,6 @@ module TConsole
           end
 
           if defined?(MiniTest)
-            # Do minitest specific stuff here
           elsif defined?(Test::Unit)
             puts "Sorry, but tconsole doesn't support Test::Unit yet"
             return

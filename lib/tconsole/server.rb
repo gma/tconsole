@@ -47,6 +47,10 @@ module TConsole
           end
 
           if defined?(MiniTest)
+            require File.join(File.dirname(__FILE__), "minitest")
+
+            MiniTest::Unit.runner.run
+            MiniTestHandler.patch_minitest
           elsif defined?(Test::Unit)
             puts "Sorry, but tconsole doesn't support Test::Unit yet"
             return

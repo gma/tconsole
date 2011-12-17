@@ -1,10 +1,9 @@
 module TConsole
   class MiniTestHandler
-    def self.run(options)
-      if options[:test_pattern]
-        args = ["--name", options[:test_pattern]]
-      else
-        args = []
+    def self.run(name_pattern)
+      args = []
+      unless name_pattern.nil?
+        args = ["--name", name_pattern]
       end
 
       MiniTest::Unit.runner.run(args)

@@ -30,7 +30,7 @@ module TConsole
       return true
     end
 
-    def run_tests(globs, message = "Running tests...")
+    def run_tests(globs, name_pattern, message = "Running tests...")
       time = Benchmark.realtime do
         fork do
 
@@ -53,7 +53,7 @@ module TConsole
           if defined?(MiniTest)
             require File.join(File.dirname(__FILE__), "minitest_handler")
 
-            MiniTestHandler.run({:test_pattern => "test_that_name_is_required"})
+            MiniTestHandler.run(name_pattern)
           elsif defined?(Test::Unit)
             puts "Sorry, but tconsole doesn't support Test::Unit yet"
             return
@@ -72,13 +72,13 @@ module TConsole
     end
 
     # This code is from the rails test:recents command
-    def run_recent
+    def run_recent(test_pattern)
       touched_since = Time.now - 600 # 10 minutes ago
       files = recent_files(touched_since, "app/models/**/*.rb", "test/unit")
       files.concat(recent_files(touched_since, "app/controllers/**/*.rb", "test/functional"))
 
       message = "Running #{files.length} #{files.length == 1 ? "test file" : "test files"} based on changed files..."
-      run_tests(files, message)
+      run_tests(files, test_pattern, message)
     end
 
     def recent_files(touched_since, source_pattern, test_path)
@@ -106,7 +106,7 @@ module TConsole
     end
 
     # Based on the code from rake test:uncommitted in Rails
-    def run_uncommitted
+    def run_uncommitted(test_pattern)
       if File.directory?(".svn")
         changed_since_checkin = silence_stderr { `svn status` }.split.map { |path| path.chomp[7 .. -1] }
       elsif File.directory?(".git")
@@ -124,7 +124,7 @@ module TConsole
       files = (unit_tests + functional_tests).uniq.select { |file| File.exist?(file) }
 
       message = "Running #{files.length} #{files.length == 1 ? "test file" : "test files"} based on uncommitted changes..."
-      run_tests(files, message)
+      run_tests(files, test_pattern, message)
     end
   end
 end

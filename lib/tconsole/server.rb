@@ -126,5 +126,12 @@ module TConsole
       message = "Running #{files.length} #{files.length == 1 ? "test file" : "test files"} based on uncommitted changes..."
       run_tests(files, test_pattern, message)
     end
+
+    def run_info
+      puts "Defined Constants:"
+      puts Module.constants.sort.join("\n")
+      puts
+      puts
+    end
   end
 end

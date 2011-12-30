@@ -21,6 +21,9 @@ module TConsole
       puts
       puts "Welcome to tconsole. Type 'help' for help or 'exit' to quit."
 
+      # Set up our console input handling and history
+      console = Console.new
+
       # Start the server
       while running
         # ignore ctrl-c during load, since things can get kind of messy if we don't
@@ -60,18 +63,28 @@ module TConsole
           exit(1)
         end
 
-        running = command_loop(server) if running
+        running = console.read_and_execute(server) if running
 
         server.stop
         Process.waitall
       end
 
+      console.store_history
+
       puts
       puts "Exiting. Bye!"
       system("stty", stty_save);
     end
+  end
 
-    def self.command_loop(server)
+  class Console
+
+    def initialize
+      read_history
+    end
+
+    # Returns true if the app should keep running, false otherwise
+    def read_and_execute(server)
       while line = Readline.readline("tconsole> ", true)
         line.strip!
         args = line.split(/\s/)
@@ -83,7 +96,7 @@ module TConsole
         elsif args[0] == "reload"
           return true
         elsif args[0] == "help"
-          help
+          print_help
         elsif args[0] == "units"
           server.run_tests(["test/unit/**/*_test.rb"], args[1])
         elsif args[0] == "functionals"
@@ -103,11 +116,11 @@ module TConsole
         end
       end
 
-      return true
+      true
     end
 
     # Prints a list of available commands
-    def self.help
+    def print_help
       puts
       puts "Available commands:"
       puts
@@ -129,6 +142,30 @@ module TConsole
       puts "name matches the pattern given. This is especially useful when rerunning a failing"
       puts "test."
       puts
+    end
+
+    def history_file
+      File.join(ENV['HOME'], ".tconsole_history")
+    end
+
+    # Stores last 50 items in history to $HOME/.tconsole_history
+    def store_history
+      if ENV['HOME']
+        File.open(history_file, "w") do |f|
+          Readline::HISTORY.to_a[0..49].each do |item|
+            f.puts(item)
+          end
+        end
+      end
+    end
+
+    # Loads history from past sessions
+    def read_history
+      if ENV['HOME'] && File.exist?(history_file)
+        File.readlines(history_file).each do |line|
+          Readline::HISTORY.push(line)
+        end
+      end
     end
   end
 end

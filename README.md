@@ -75,7 +75,7 @@ You can also focus in on just the tests in a given filename by entering a test f
 You can go one bit deeper and just run a particular test in that file
 with an extra argument:
 
-        > test/unit/user_test.rb test_that_user_is_healthy
+	> test/unit/user_test.rb test_that_user_is_healthy
 
 That command will load up the user_test.rb file and then only run the
 test named test_that_user_is_healthy. You can add a specific test name

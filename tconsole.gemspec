@@ -8,8 +8,9 @@ Gem::Specification.new do |s|
   s.authors     = ["Alan Johnson"]
   s.email       = ["alan@commondream.net"]
   s.homepage    = ""
-  s.summary     = %q{tconsole gives you a helpful console for running Rails tests}
-  s.description = %q{tconsole gives you a helpful console for running Rails tests}
+  s.summary     = %q{tconsole is a helpful console for running Rails tests}
+  s.description = %q{tconsole allows Rails developers to easily and quickly run their tests as a whole or in subsets. It forks the testing processes from
+                     a preloaded test environment to ensure that developers don't have to reload their entire Rails environment between test runs.}
 
   s.rubyforge_project = "tconsole"
 

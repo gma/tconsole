@@ -6,7 +6,7 @@ concerning what tests to run, and see their test output. It's also got a
 helpful reload command for when your Rails environment needs to be
 restarted.
 
-tconsole has only been tested with Rails 3 with Ruby 1.9.3 with MiniTest as the testing framework (the Rails default) on a Mac. This is super mega alpha at this point, so your mileage may vary. I'd love to hear how it works for you, though!
+tconsole has only been tested with Rails 3 with Ruby 1.9.3 with MiniTest as the testing framework (the Rails default) on a Mac, but in theory it should work with pretty much any Unixy operating system (tconsole uses fork a good bit).
 
 Why use tconsole?
 ------
@@ -16,11 +16,19 @@ Why use tconsole?
 
 What about Spork?
 ------
-Spork's really cool, but I've always felt like using DRb and having extra consoles open feels a bit heavy for what I want to do. Beyond that, I couldn't ever figure out how to get Spork to work with test/unit, and since me and DHH are the only two people who still use test/unit someone's got to carry the torch for test/unit awesomeness. Really, though, if Spork's your cup of tea, stop reading this and use what you like.
+Spork's really cool, and it was my primary motivation behind writing tconsole, but I've always felt like having an extra console open for my spork server and another to run my commands is a bit heavy for what I want to do. Beyond that, I couldn't ever figure out how to get Spork to work with test/unit, and since me and DHH are the only two people who still use test/unit I figured it was up to me to come up with something that worked great. If Spork's your cup of tea, though, stop reading this and use what you like.
+
+What about rspec?
+------
+I'm not sure if tconsole will ever support rspec or not. I love the idea
+of adding support for rspec, but I also don't use rspec all that often,
+so it likely wouldn't be very well tested. If enough people fuss at me,
+or if someone were willing to add and maintain rspec support I'd definitely be
+willing to merge it in, though.
 
 Installing tconsole
 ------
-	gem install tconsole --pre
+	gem install tconsole
 
 How to use tconsole
 ------
@@ -63,6 +71,15 @@ If you want to focus in on a particular subset of your tests, like units, functi
 You can also focus in on just the tests in a given filename by entering a test file name into tconsole:
 
 	> test/unit/user_test.rb
+
+You can go one bit deeper and just run a particular test in that file
+with an extra argument:
+
+  > test/unit/user_test.rb test_that_user_is_healthy
+
+That command will load up the user_test.rb file and then only run the
+test named test_that_user_is_healthy. You can add a specific test name
+argument to any tconsole command that runs tests.
 	
 If you update your environment, maybe by editing your Gemfile or changing one of your application's configuration files, you can use the `reload` command to reload the entire environment:
 
@@ -75,6 +92,6 @@ And then finally, you can run the `exit` command to quit:
 Reporting Issues and Contributing
 ------
 
-Feel free to report issues in the issue tracker at https://github.com/commondream/tconsole/issues. For bonus points, fork the project and send me a pull request with the fix for the issue you're seeing.
+Feel free to report issues in the issue tracker at https://github.com/commondream/tconsole/issues. Be sure to include the versions of Ruby, Rails, and your operating system. For bonus points, fork the project and send me a pull request with the fix for the issue you're seeing.
 
 tconsole is just a quick idea I had that I wanted to spike out, so there aren't any tests yet. Hopefully that will change in the near future!

@@ -1,5 +1,11 @@
 module TConsole
   class Server
+    attr_accessor :config
+
+    def initialize(config)
+      self.config = config
+    end
+
     def stop
       DRb.stop_service
     end
@@ -19,8 +25,12 @@ module TConsole
           Rake.application.invoke_task("db:test:load")
           Rake.application.invoke_task("test:prepare")
         rescue Exception => e
-          puts "Error: Loading your environment failed."
-          puts "    #{e.message}"
+          puts "Error - Loading your environment failed: #{e.message}"
+          if config[:trace] == true
+            puts
+            puts "    #{e.backtrace.join("\n    ")}"
+          end
+
           return false
         end
       end

@@ -2,4 +2,4 @@
 
 require File.join(File.dirname(__FILE__), "..", "lib", "tconsole")
 
-TConsole::Runner.run
+TConsole::Runner.run(ARGV)

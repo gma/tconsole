@@ -11,7 +11,7 @@ module TConsole
     SERVER_URI = "druby://localhost:8788" 
     # Spawns a new environment. Looks at the results of the environment to determine whether to stop or
     # keep running
-    def self.run
+    def self.run(argv)
       stty_save = `stty -g`.chomp
 
       running = true
@@ -24,13 +24,17 @@ module TConsole
       # Set up our console input handling and history
       console = Console.new
 
+      # set up the config
+      config = {:trace => false}
+      config[:trace] = true if argv.include?("--trace")
+
       # Start the server
       while running
         # ignore ctrl-c during load, since things can get kind of messy if we don't
 
         fork do
           begin
-            server = Server.new
+            server = Server.new(config)
 
             DRb.start_service(SERVER_URI, server)
 

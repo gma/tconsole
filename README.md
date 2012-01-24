@@ -16,7 +16,7 @@ Why use tconsole?
 
 What about Spork?
 ------
-Spork's really cool, and it was my primary motivation behind writing tconsole, but I've always felt like having an extra console open for my spork server and another to run my commands is a bit heavy for what I want to do. Beyond that, I couldn't ever figure out how to get Spork to work with test/unit, and since me and DHH are the only two people who still use test/unit I figured it was up to me to come up with something that worked great. If Spork's your cup of tea, though, stop reading this and use what you like.
+[Spork](https://github.com/sporkrb/spork)'s really cool, and it was my primary motivation behind writing tconsole, but I've always felt like having an extra console open for my spork server and another to run my commands is a bit heavy for what I want to do. Beyond that, I couldn't ever figure out how to get Spork to work with test/unit, and since me and DHH are the only two people who still use test/unit I figured it was up to me to come up with something that worked great. If Spork's your cup of tea, though, stop reading this and use what you like.
 
 What about rspec?
 ------
@@ -75,7 +75,7 @@ You can also focus in on just the tests in a given filename by entering a test f
 You can go one bit deeper and just run a particular test in that file
 with an extra argument:
 
-  > test/unit/user_test.rb test_that_user_is_healthy
+	> test/unit/user_test.rb test_that_user_is_healthy
 
 That command will load up the user_test.rb file and then only run the
 test named test_that_user_is_healthy. You can add a specific test name

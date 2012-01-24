@@ -68,6 +68,17 @@ If you want to focus in on a particular subset of your tests, like units, functi
          
 	> integration
          
+
+If you'd like to just run the tests that are related to recent changes
+you've made:
+
+  > recent
+
+Or if you'd like to run the tests for changes you've made since your
+last commit:
+
+  > uncommitted
+
 You can also focus in on just the tests in a given filename by entering a test file name into tconsole:
 
 	> test/unit/user_test.rb
@@ -80,7 +91,7 @@ with an extra argument:
 That command will load up the user_test.rb file and then only run the
 test named test_that_user_is_healthy. You can add a specific test name
 argument to any tconsole command that runs tests.
-	
+
 If you update your environment, maybe by editing your Gemfile or changing one of your application's configuration files, you can use the `reload` command to reload the entire environment:
 
 	> reload

@@ -121,9 +121,9 @@ module TConsole
           return true
         elsif args[0] == "help"
           print_help
-        elsif args[0] == "units"
+        elsif args[0] == "units" || args[0] == "unit"
           server.run_tests(["test/unit/**/*_test.rb"], args[1])
-        elsif args[0] == "functionals"
+        elsif args[0] == "functionals" || args[0] == "functional"
           server.run_tests(["test/functional/**/*_test.rb"], args[1])
         elsif args[0] == "integration"
           server.run_tests(["test/integration/**/*_test.rb"], args[1])

@@ -8,7 +8,6 @@ require "drb/drb"
 module TConsole
   class Runner
 
-    SERVER_URI = "druby://localhost:8788" 
     # Spawns a new environment. Looks at the results of the environment to determine whether to stop or
     # keep running
     def self.run(argv)
@@ -32,12 +31,11 @@ module TConsole
       while running
         # ignore ctrl-c during load, since things can get kind of messy if we don't
 
-        fork do
+        server_pid = fork do
           begin
             server = Server.new(config)
 
-            DRb.start_service(SERVER_URI, server)
-
+            drb_server = DRb.start_service("drbunix://tmp/tconsole.#{Process.pid}", server)
             DRb.thread.join
           rescue Interrupt
             # do nothing here since the outer process will shut things down for us
@@ -45,7 +43,7 @@ module TConsole
         end
 
         # Set up our client connection to the server
-        server = DRbObject.new_with_uri(SERVER_URI)
+        server = DRbObject.new_with_uri("drbunix://tmp/tconsole.#{server_pid}")
 
         loaded = false
         wait_until = Time.now + 10
@@ -89,7 +87,7 @@ module TConsole
 
     # Returns true if the app should keep running, false otherwise
     def read_and_execute(server)
-      while line = Readline.readline("tconsole> ", true)
+      while line = Readline.readline("tconsole> ", false)
         line.strip!
         args = line.split(/\s/)
 

@@ -1,10 +1,10 @@
 module TConsole
   class Server
-    attr_accessor :config, :last_failed
+    attr_accessor :config, :last_result
 
     def initialize(config)
       self.config = config
-      self.last_failed = []
+      self.last_result = TConsole::TestResult.new
     end
 
     def stop
@@ -44,7 +44,11 @@ module TConsole
 
     def run_tests(globs, name_pattern, message = "Running tests...")
       time = Benchmark.realtime do
+        # Pipe for communicating with child so we can get its results back
+        read, write = IO.pipe
+
         fork do
+          read.close
 
           puts message
           puts
@@ -65,7 +69,9 @@ module TConsole
           if defined?(MiniTest)
             require File.join(File.dirname(__FILE__), "minitest_handler")
 
-            MiniTestHandler.run(name_pattern)
+            result = MiniTestHandler.run(name_pattern)
+            write.puts([Marshal.dump(result)].pack("m"))
+
           elsif defined?(Test::Unit)
             puts "Sorry, but tconsole doesn't support Test::Unit yet"
             return
@@ -74,6 +80,11 @@ module TConsole
             return
           end
         end
+
+        write.close
+        response = read.read
+        self.last_result = Marshal.load(response.unpack("m")[0])
+        read.close
 
         Process.waitall
       end
@@ -93,12 +104,16 @@ module TConsole
       run_tests(files, test_pattern, message)
     end
 
-    def run_failed(test_pattern)
-      file_names = self.last_failed.map {|class_name| class_name.tableize.singularize}
+    def run_failed
+      # TODO: We probably shouldn't use built in Rails methods here if we can help it
+      file_names = last_result.failure_details.map {|detail| detail[0].tableize.singularize}
+      puts "Failed: #{file_names.join(",")}"
       files_to_rerun = []
-      files_to_rerun << file_name.map {|file| (file.match(/controller/)) ? "/functionals/#{file}.rb" : "/units/#{file}.rb"}
+
+      # TODO: this is a little too simplistic. What happens if there's an integration test and a unit test with the same name?
+      files_to_rerun << file_names.map {|file| (file.match(/controller/)) ? "test/functional/#{file}.rb" : "test/unit/#{file}.rb"}
       message = "Running last failed tests"
-      run_tests(files_to_rerun, test_pattern, message)
+      run_tests(files_to_rerun, nil, message)
     end
 
     def recent_files(touched_since, source_pattern, test_path)

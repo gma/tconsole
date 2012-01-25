@@ -1,5 +1,6 @@
 require "tconsole/version"
 require "tconsole/server"
+require "tconsole/test_result"
 
 require "readline"
 require "benchmark"
@@ -132,8 +133,8 @@ module TConsole
           server.run_uncommitted(args[1])
         elsif args[0] == "all"
           server.run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"], args[1])
-        elsif args[0] == "failed"
-          server.run_failed(args[1])
+        elsif args[0] == "!failed"
+          server.run_failed
         elsif args[0] == "info"
           server.run_info
         else
@@ -155,10 +156,10 @@ module TConsole
       puts "integration [test_pattern]  # Run integration tests"
       puts "recent [test_pattern]       # Run tests for recently changed files"
       puts "uncommitted [test_pattern]  # Run tests for uncommitted changes"
+      puts "!failed                     # Runs the last set of failing tests"
       puts "[filename] [test_pattern]   # Run the tests contained in the given file"
       puts "reload                      # Reload your Rails environment"
       puts "exit                        # Exit the console"
-      puts
       puts
       puts "Working with test patterns:"
       puts

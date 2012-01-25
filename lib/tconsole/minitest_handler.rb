@@ -8,9 +8,22 @@ module TConsole
 
       runner = MiniTest::Unit.runner
       runner.run(args)
-      Server.last_failed = runner.report.map {|item| item.match(/\((\w+)\)/)[1] } if runner.failures > 0
+
+      result = TConsole::TestResult.new
+      result.failures = runner.failures
+      result.errors = runner.errors
+
+      if runner.failures > 0 || runner.errors > 0
+        result.failure_details = runner.report.map do |item|
+          match = item.match(/(\w+)\((\w+)\)/)
+
+          [match[2], match[1]]
+        end
+      end
 
       patch_minitest
+
+      result
     end
 
     # We're basically breaking MiniTest autorun here, since we want to manually run our

@@ -120,9 +120,9 @@ module TConsole
           return true
         elsif args[0] == "help"
           print_help
-        elsif args[0] == "units"
+        elsif args[0] == "units" || args[0] == "unit"
           server.run_tests(["test/unit/**/*_test.rb"], args[1])
-        elsif args[0] == "functionals"
+        elsif args[0] == "functionals" || args[0] == "functional"
           server.run_tests(["test/functional/**/*_test.rb"], args[1])
         elsif args[0] == "integration"
           server.run_tests(["test/integration/**/*_test.rb"], args[1])
@@ -132,6 +132,8 @@ module TConsole
           server.run_uncommitted(args[1])
         elsif args[0] == "all"
           server.run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"], args[1])
+        elsif args[0] == "failed"
+          server.run_failed(args[1])
         elsif args[0] == "info"
           server.run_info
         else

@@ -88,6 +88,8 @@ module TConsole
     # Returns true if the app should keep running, false otherwise
     def read_and_execute(server)
       while line = Readline.readline("tconsole> ", false)
+        Readline::HISTORY << line unless Readline::HISTORY[-1] == line
+
         line.strip!
         args = line.split(/\s/)
 

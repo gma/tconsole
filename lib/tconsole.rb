@@ -5,6 +5,24 @@ require "readline"
 require "benchmark"
 require "drb/drb"
 
+Readline.completion_append_character = ""
+
+# Proc for helping us figure out autocompletes
+Readline.completion_proc = Proc.new do |str|
+  known_commands = TConsole::Console::KNOWN_COMMANDS.grep(/^#{Regexp.escape(str)}/)
+
+  files = Dir[str+'*'].grep(/^#{Regexp.escape(str)}/)
+  formatted_files = files.collect do |filename| 
+    if File.directory?(filename)
+      filename + File::SEPARATOR
+    else
+      filename
+    end
+  end
+
+  known_commands.concat(formatted_files)
+end
+
 module TConsole
   class Runner
 
@@ -80,6 +98,7 @@ module TConsole
   end
 
   class Console
+    KNOWN_COMMANDS = ["exit", "reload", "help", "units", "functionals", "integration", "recent", "uncommitted", "all", "info"]
 
     def initialize
       read_history
@@ -173,3 +192,5 @@ module TConsole
     end
   end
 end
+
+

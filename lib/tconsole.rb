@@ -113,6 +113,8 @@ module TConsole
           server.run_uncommitted(args[1])
         elsif args[0] == "all"
           server.run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"], args[1])
+        elsif args[0] == "failed"
+          server.run_failed(args[1])
         elsif args[0] == "info"
           server.run_info
         else

@@ -1,9 +1,10 @@
 module TConsole
   class Server
-    attr_accessor :config
+    attr_accessor :config, :last_failed
 
     def initialize(config)
       self.config = config
+      self.last_failed = []
     end
 
     def stop
@@ -90,6 +91,14 @@ module TConsole
 
       message = "Running #{files.length} #{files.length == 1 ? "test file" : "test files"} based on changed files..."
       run_tests(files, test_pattern, message)
+    end
+
+    def run_failed(test_pattern)
+      file_names = self.last_failed.map {|class_name| class_name.tableize.singularize}
+      files_to_rerun = []
+      files_to_rerun << file_name.map {|file| (file.match(/controller/)) ? "/functionals/#{file}.rb" : "/units/#{file}.rb"}
+      message = "Running last failed tests"
+      run_tests(files_to_rerun, test_pattern, message)
     end
 
     def recent_files(touched_since, source_pattern, test_path)

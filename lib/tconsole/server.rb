@@ -43,6 +43,7 @@ module TConsole
     end
 
     def run_tests(globs, name_pattern, message = "Running tests...")
+      read, write = IO.pipe
       time = Benchmark.realtime do
         fork do
 
@@ -63,9 +64,10 @@ module TConsole
           end
 
           if defined?(MiniTest)
+            read.close
             require File.join(File.dirname(__FILE__), "minitest_handler")
-
             MiniTestHandler.run(name_pattern)
+            write.puts [Marshal.dump(self.last_failed)].pack("m")
           elsif defined?(Test::Unit)
             puts "Sorry, but tconsole doesn't support Test::Unit yet"
             return
@@ -78,6 +80,12 @@ module TConsole
         Process.waitall
       end
 
+      write.close
+      begin
+        self.last_failed = Marshal.load(read.read.unpack("m")[0])
+      rescue ArgumentError
+        #do nothing, there are no failed tests
+      end
       puts
       puts "Test time (including load): #{time}s"
       puts
@@ -94,9 +102,8 @@ module TConsole
     end
 
     def run_failed(test_pattern)
-      file_names = self.last_failed.map {|class_name| class_name.tableize.singularize}
-      files_to_rerun = []
-      files_to_rerun << file_name.map {|file| (file.match(/controller/)) ? "/functionals/#{file}.rb" : "/units/#{file}.rb"}
+      file_names = last_failed.map {|class_name| class_name.tableize.singularize}
+      files_to_rerun = file_names.map {|file| (file.match(/controller/)) ? "/functionals/#{file}.rb" : "/units/#{file}.rb"}
       message = "Running last failed tests"
       run_tests(files_to_rerun, test_pattern, message)
     end

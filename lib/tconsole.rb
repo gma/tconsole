@@ -92,7 +92,6 @@ module TConsole
       while line = Readline.readline("tconsole> ", true)
         line.strip!
         args = line.split(/\s/)
-
         if line == ""
           # do nothing
         elsif args[0] == "exit"
@@ -111,10 +110,10 @@ module TConsole
           server.run_recent(args[1])
         elsif args[0] == "uncommitted"
           server.run_uncommitted(args[1])
-        elsif args[0] == "all"
-          server.run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"], args[1])
         elsif args[0] == "failed"
           server.run_failed(args[1])
+        elsif args[0] == "all"
+          server.run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"], args[1])
         elsif args[0] == "info"
           server.run_info
         else
@@ -136,6 +135,7 @@ module TConsole
       puts "integration [test_pattern]  # Run integration tests"
       puts "recent [test_pattern]       # Run tests for recently changed files"
       puts "uncommitted [test_pattern]  # Run tests for uncommitted changes"
+      puts "failed                      # Run the last failed tests"
       puts "[filename] [test_pattern]   # Run the tests contained in the given file"
       puts "reload                      # Reload your Rails environment"
       puts "exit                        # Exit the console"

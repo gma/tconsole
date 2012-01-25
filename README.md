@@ -32,9 +32,9 @@ Installing tconsole
 
 How to use tconsole
 ------
-In your shell of choice, cd into your Rails project's directory and then run the `tconsole` command to fire up the console. You should see something like this:
+In your shell of choice, cd into your Rails project's directory and then run `bundle exec tconsole` to fire up the console. You should see something like this:
 
-	tconsole
+	bundle exec tconsole
 	
 	Loading your Rails environment...
 	Environment loaded in 7.160264s.

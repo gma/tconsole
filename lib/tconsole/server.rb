@@ -83,7 +83,13 @@ module TConsole
 
         write.close
         response = read.read
-        self.last_result = Marshal.load(response.unpack("m")[0])
+        begin
+          self.last_result = Marshal.load(response.unpack("m")[0])
+        rescue
+          # Just in case anything crazy goes down with marshalling
+          self.last_result = TConsole::TestResult.new
+        end
+
         read.close
 
         Process.waitall
@@ -110,7 +116,8 @@ module TConsole
       puts "Failed: #{file_names.join(",")}"
       files_to_rerun = []
 
-      # TODO: this is a little too simplistic. What happens if there's an integration test and a unit test with the same name?
+      # TODO: this is a little too simplistic. What happens if there's an integration test and a unit test with the same name? I think some kind of prioritized glob match
+      # would be a better strategy
       files_to_rerun << file_names.map {|file| (file.match(/controller/)) ? "test/functional/#{file}.rb" : "test/unit/#{file}.rb"}
       message = "Running last failed tests"
       run_tests(files_to_rerun, nil, message)

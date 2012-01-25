@@ -98,7 +98,7 @@ module TConsole
   end
 
   class Console
-    KNOWN_COMMANDS = ["exit", "reload", "help", "units", "functionals", "integration", "recent", "uncommitted", "all", "info"]
+    KNOWN_COMMANDS = ["exit", "reload", "help", "units", "functionals", "integration", "recent", "uncommitted", "all", "info", "!failed"]
 
     def initialize
       read_history
@@ -107,7 +107,8 @@ module TConsole
     # Returns true if the app should keep running, false otherwise
     def read_and_execute(server)
       while line = Readline.readline("tconsole> ", false)
-        Readline::HISTORY << line unless Readline::HISTORY[-1] == line
+        # TODO: Avoid pushing duplicate commands onto the history
+        Readline::HISTORY << line
 
         line.strip!
         args = line.split(/\s/)
@@ -175,7 +176,7 @@ module TConsole
     def store_history
       if ENV['HOME']
         File.open(history_file, "w") do |f|
-          Readline::HISTORY.to_a[0..49].each do |item|
+          Readline::HISTORY.to_a.reverse[0..49].each do |item|
             f.puts(item)
           end
         end
@@ -185,8 +186,8 @@ module TConsole
     # Loads history from past sessions
     def read_history
       if ENV['HOME'] && File.exist?(history_file)
-        File.readlines(history_file).each do |line|
-          Readline::HISTORY.push(line)
+        File.readlines(history_file).reverse.each do |line|
+          Readline::HISTORY << line
         end
       end
     end

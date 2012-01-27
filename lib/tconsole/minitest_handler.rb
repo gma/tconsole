@@ -6,7 +6,9 @@ module TConsole
         args = ["--name", name_pattern]
       end
 
-      MiniTest::Unit.runner.run(args)
+      runner = MiniTest::Unit.runner
+      runner.run(args)
+      server.last_failed = runner.report.map {|item| item.match(/\((\w+)\)/)[1] } if runner.failures > 0
 
       patch_minitest
     end

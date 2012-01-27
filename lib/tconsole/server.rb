@@ -1,9 +1,10 @@
 module TConsole
   class Server
-    attr_accessor :config
+    attr_accessor :config, :last_failed
 
     def initialize(config)
       self.config = config
+      self.last_failed = []
     end
 
     def stop
@@ -22,7 +23,9 @@ module TConsole
           require 'rake'
           Rake.application.init
           Rake.application.load_rakefile
-          Rake.application.invoke_task("db:test:load")
+          if Rake.application.tasks.include?("db:test:load")
+            Rake.application.invoke_task("db:test:load")
+          end
           Rake.application.invoke_task("test:prepare")
         rescue Exception => e
           puts "Error - Loading your environment failed: #{e.message}"
@@ -42,6 +45,7 @@ module TConsole
     end
 
     def run_tests(globs, name_pattern, message = "Running tests...")
+      read, write = IO.pipe
       time = Benchmark.realtime do
         fork do
 
@@ -62,9 +66,10 @@ module TConsole
           end
 
           if defined?(MiniTest)
+            read.close
             require File.join(File.dirname(__FILE__), "minitest_handler")
-
             MiniTestHandler.run(name_pattern)
+            write.puts [Marshal.dump(self.last_failed)].pack("m")
           elsif defined?(Test::Unit)
             puts "Sorry, but tconsole doesn't support Test::Unit yet"
             return
@@ -77,6 +82,12 @@ module TConsole
         Process.waitall
       end
 
+      write.close
+      begin
+        self.last_failed = Marshal.load(read.read.unpack("m")[0])
+      rescue ArgumentError
+        #do nothing, there are no failed tests
+      end
       puts
       puts "Test time (including load): #{time}s"
       puts
@@ -90,6 +101,13 @@ module TConsole
 
       message = "Running #{files.length} #{files.length == 1 ? "test file" : "test files"} based on changed files..."
       run_tests(files, test_pattern, message)
+    end
+
+    def run_failed(test_pattern)
+      file_names = last_failed.map {|class_name| class_name.tableize.singularize}
+      files_to_rerun = file_names.map {|file| (file.match(/controller/)) ? "/functionals/#{file}.rb" : "/units/#{file}.rb"}
+      message = "Running last failed tests"
+      run_tests(files_to_rerun, test_pattern, message)
     end
 
     def recent_files(touched_since, source_pattern, test_path)

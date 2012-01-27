@@ -23,7 +23,9 @@ module TConsole
           require 'rake'
           Rake.application.init
           Rake.application.load_rakefile
-          Rake.application.invoke_task("db:test:load")
+          if Rake.application.tasks.include?("db:test:load")
+            Rake.application.invoke_task("db:test:load")
+          end
           Rake.application.invoke_task("test:prepare")
         rescue Exception => e
           puts "Error - Loading your environment failed: #{e.message}"

@@ -5,10 +5,27 @@ require "readline"
 require "benchmark"
 require "drb/drb"
 
+Readline.completion_append_character = ""
+
+# Proc for helping us figure out autocompletes
+Readline.completion_proc = Proc.new do |str|
+  known_commands = TConsole::Console::KNOWN_COMMANDS.grep(/^#{Regexp.escape(str)}/)
+
+  files = Dir[str+'*'].grep(/^#{Regexp.escape(str)}/)
+  formatted_files = files.collect do |filename| 
+    if File.directory?(filename)
+      filename + File::SEPARATOR
+    else
+      filename
+    end
+  end
+
+  known_commands.concat(formatted_files)
+end
+
 module TConsole
   class Runner
 
-    SERVER_URI = "druby://localhost:8788" 
     # Spawns a new environment. Looks at the results of the environment to determine whether to stop or
     # keep running
     def self.run(argv)
@@ -32,12 +49,11 @@ module TConsole
       while running
         # ignore ctrl-c during load, since things can get kind of messy if we don't
 
-        fork do
+        server_pid = fork do
           begin
             server = Server.new(config)
 
-            DRb.start_service(SERVER_URI, server)
-
+            drb_server = DRb.start_service("drbunix://tmp/tconsole.#{Process.pid}", server)
             DRb.thread.join
           rescue Interrupt
             # do nothing here since the outer process will shut things down for us
@@ -45,7 +61,7 @@ module TConsole
         end
 
         # Set up our client connection to the server
-        server = DRbObject.new_with_uri(SERVER_URI)
+        server = DRbObject.new_with_uri("drbunix://tmp/tconsole.#{server_pid}")
 
         loaded = false
         wait_until = Time.now + 10
@@ -82,6 +98,7 @@ module TConsole
   end
 
   class Console
+    KNOWN_COMMANDS = ["exit", "reload", "help", "units", "functionals", "integration", "recent", "uncommitted", "all", "info", "!failed"]
 
     def initialize
       read_history
@@ -89,7 +106,10 @@ module TConsole
 
     # Returns true if the app should keep running, false otherwise
     def read_and_execute(server)
-      while line = Readline.readline("tconsole> ", true)
+      while line = Readline.readline("tconsole> ", false)
+        # TODO: Avoid pushing duplicate commands onto the history
+        Readline::HISTORY << line
+
         line.strip!
         args = line.split(/\s/)
         if line == ""
@@ -158,7 +178,7 @@ module TConsole
     def store_history
       if ENV['HOME']
         File.open(history_file, "w") do |f|
-          Readline::HISTORY.to_a[0..49].each do |item|
+          Readline::HISTORY.to_a.reverse[0..49].each do |item|
             f.puts(item)
           end
         end
@@ -168,10 +188,12 @@ module TConsole
     # Loads history from past sessions
     def read_history
       if ENV['HOME'] && File.exist?(history_file)
-        File.readlines(history_file).each do |line|
-          Readline::HISTORY.push(line)
+        File.readlines(history_file).reverse.each do |line|
+          Readline::HISTORY << line
         end
       end
     end
   end
 end
+
+

@@ -55,12 +55,12 @@ module TConsole
             paths.concat(Dir.glob(glob))
           end
 
-          paths.each do |path|
-            require File.realpath(path)
-          end
-
           if defined? ActiveRecord
             ActiveRecord::Base.connection.reconnect!
+          end
+
+          paths.each do |path|
+            require File.realpath(path)
           end
 
           if defined?(MiniTest)

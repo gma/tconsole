@@ -6,7 +6,7 @@ concerning what tests to run, and see their test output. It's also got a
 helpful reload command for when your Rails environment needs to be
 restarted.
 
-tconsole has only been tested with Rails 3 with Ruby 1.9.3 with MiniTest as the testing framework (the Rails default) on a Mac, but in theory it should work with pretty much any Unixy operating system (tconsole uses fork a good bit).
+tconsole has only been tested with Rails 3 with Ruby 1.9.3 and 1.8.7 with MiniTest as the testing framework (the Rails default) on a Mac, but in theory it should work with pretty much any Unixy operating system (tconsole uses fork a good bit).
 
 Why use tconsole?
 ------

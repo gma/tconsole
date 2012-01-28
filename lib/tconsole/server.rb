@@ -59,7 +59,7 @@ module TConsole
           end
 
           paths.each do |path|
-            require File.realpath(path)
+            require File.expand_path(path)
           end
 
           if defined? ::ActiveRecord

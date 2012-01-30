@@ -6,7 +6,7 @@ module TConsole
         args = ["--name", name_pattern]
       end
 
-      MiniTest::Unit.runner.run(args)
+      MiniTest::Unit.new.run(args)
 
       patch_minitest
     end

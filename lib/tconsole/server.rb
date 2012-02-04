@@ -68,13 +68,15 @@ module TConsole
           end
 
           if defined? ::ActiveRecord
-            ::ActiveRecord::Base.connection.reconnect!
+            ::ActiveRecord::Base.clear_active_connections!
+            ::ActiveRecord::Base.establish_connection
           end
 
           if defined?(::MiniTest)
             require File.join(File.dirname(__FILE__), "minitest_handler")
 
             result = MiniTestHandler.run(name_pattern)
+
             write.puts([Marshal.dump(result)].pack("m"))
 
           elsif defined?(::Test::Unit)
@@ -121,11 +123,8 @@ module TConsole
       puts "Failed: #{file_names.join(",")}"
       files_to_rerun = []
 
-      # TODO: this is a little too simplistic. What happens if there's an integration test and a unit test with the same name? I think some kind of prioritized glob match
-      # would be a better strategy
       files_to_rerun << file_names.map {|file| (file.match(/controller/)) ? "test/functional/#{file}.rb" : "test/unit/#{file}.rb"}
-      message = "Running last failed tests"
-      run_tests(files_to_rerun, nil, message)
+      run_tests(files_to_rerun, "*", "Running last failed tests")
     end
 
     def recent_files(touched_since, source_pattern, test_path)

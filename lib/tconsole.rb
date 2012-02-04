@@ -37,7 +37,7 @@ module TConsole
 
       # A little welcome
       puts
-      puts "Welcome to tconsole. Type 'help' for help or 'exit' to quit."
+      puts "Welcome to tconsole (v#{TConsole::VERSION}). Type 'help' for help or 'exit' to quit."
 
       # Set up our console input handling and history
       console = Console.new

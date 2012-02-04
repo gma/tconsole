@@ -13,8 +13,12 @@ module TConsole
       result.failures = runner.failures
       result.errors = runner.errors
 
+      puts "Failures: #{runner.failures}"
+      puts "Errors: #{runner.errors}"
+
       if runner.failures > 0 || runner.errors > 0
         result.failure_details = runner.report.map do |item|
+          puts item
           match = item.match(/(\w+)\((\w+)\)/)
 
           [match[2], match[1]]

@@ -119,12 +119,11 @@ module TConsole
 
     def run_failed
       # TODO: We probably shouldn't use built in Rails methods here if we can help it
-      file_names = last_result.failure_details.map {|detail| detail[0].tableize.singularize}
-      puts "Failed: #{file_names.join(",")}"
+      file_names = last_result.failure_details.map { |detail| filenameify(detail[:class]) }
       files_to_rerun = []
 
       files_to_rerun << file_names.map {|file| (file.match(/controller/)) ? "test/functional/#{file}.rb" : "test/unit/#{file}.rb"}
-      run_tests(files_to_rerun, "*", "Running last failed tests")
+      run_tests(files_to_rerun, nil, "Running last failed tests: #{files_to_rerun.join(", ")}")
     end
 
     def recent_files(touched_since, source_pattern, test_path)
@@ -178,6 +177,25 @@ module TConsole
       puts Module.constants.sort.join("\n")
       puts
       puts
+    end
+
+    def filenameify(klass_name)
+      result = ""
+      first = true
+      klass_name.chars do |char|
+        new = char.downcase!
+        if new.nil?
+          result << char
+        elsif first
+          result << new
+        else
+          result << "_#{new}"
+        end
+
+        first = false
+      end
+
+      result
     end
   end
 end

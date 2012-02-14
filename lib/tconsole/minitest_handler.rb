@@ -41,12 +41,57 @@ module TConsole
 
   # Custom minitest runner for tconsole
   class MiniTestUnit < ::MiniTest::Unit
+    COLOR_MAP = {
+      "S" => ::Term::ANSIColor.cyan,
+      "E" => ::Term::ANSIColor.red,
+      "F" => ::Term::ANSIColor.red,
+      "P" => ::Term::ANSIColor.green
+    }
+
     attr_accessor :results
 
     def initialize
       self.results = TConsole::TestResult.new
 
       super
+    end
+
+    def _run_anything(type)
+      suites = TestCase.send "#{type}_suites"
+      return if suites.empty?
+
+      start = Time.now
+
+      @test_count, @assertion_count = 0, 0
+      sync = output.respond_to? :"sync=" # stupid emacs
+      old_sync, output.sync = output.sync, true if sync
+
+      results = _run_suites(suites, type)
+
+      @test_count      = results.inject(0) { |sum, (tc, _)| sum + tc }
+      @assertion_count = results.inject(0) { |sum, (_, ac)| sum + ac }
+
+      output.sync = old_sync if sync
+
+      t = Time.now - start
+
+      puts
+      puts
+      puts "Finished #{type}s in %.6fs, %.4f tests/s, %.4f assertions/s." %
+        [t, test_count / t, assertion_count / t]
+
+      report.each_with_index do |msg, i|
+        puts "\n%3d) %s" % [i + 1, msg]
+      end
+
+      puts
+
+      status
+    end
+
+    def status(io = self.output)
+      format = "%d tests, %d assertions, %d failures, %d errors, %d skips"
+      io.puts format % [test_count, assertion_count, failures, errors, skips]
     end
 
     def _run_suite(suite, type)
@@ -58,13 +103,18 @@ module TConsole
         inst._assertions = 0
 
         # Print the suite name if needed
-        puts suite if results.add_suite(suite)
+        if results.add_suite(suite)
+          print("\n\n", ::Term::ANSIColor.cyan, suite, ::Term::ANSIColor.reset, "\n")
+        end
 
         @start_time = Time.now
         result = inst.run self
         time = Time.now - @start_time
 
-        print result
+        result = "P" if result == "."
+        output = "#{result} #{method}"
+
+        print COLOR_MAP[result], " #{output}", ::Term::ANSIColor.reset, "\n"
 
         inst._assertions
       }
@@ -96,3 +146,6 @@ module TConsole
     end
   end
 end
+
+# Make sure that output is only colored when it should be
+Term::ANSIColor::coloring = STDOUT.isatty

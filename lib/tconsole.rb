@@ -6,6 +6,7 @@ require "tconsole/util"
 require "readline"
 require "benchmark"
 require "drb/drb"
+require "term/ansicolor"
 
 Readline.completion_append_character = ""
 

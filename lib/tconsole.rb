@@ -162,7 +162,7 @@ module TConsole
       puts "recent [test_pattern]       # Run tests for recently changed files"
       puts "uncommitted [test_pattern]  # Run tests for uncommitted changes"
       puts "!failed                     # Runs the last set of failing tests"
-      puts "!timings                    # Lists the timings for the last test run, sorted."
+      puts "!timings [limit]            # Lists the timings for the last test run, sorted."
       puts "[filename] [test_pattern]   # Run the tests contained in the given file"
       puts "reload                      # Reload your Rails environment"
       puts "exit                        # Exit the console"

@@ -114,7 +114,7 @@ module TConsole
         result = "P" if result == "."
         output = "#{result} #{method}"
 
-        print COLOR_MAP[result], " #{output}", ::Term::ANSIColor.reset, "\n"
+        print COLOR_MAP[result], " #{output}", ::Term::ANSIColor.reset, " #{time}s\n"
 
         inst._assertions
       }

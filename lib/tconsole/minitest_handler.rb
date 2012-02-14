@@ -110,6 +110,7 @@ module TConsole
         @start_time = Time.now
         result = inst.run self
         time = Time.now - @start_time
+        results.add_timing(suite, method, time)
 
         result = "P" if result == "."
         output = "#{result} #{method}"

@@ -15,17 +15,21 @@ module TConsole
     # The suites that we've run
     attr_accessor :suites
 
+    # The timings for the tests we've run
+    attr_accessor :timings
+
     def initialize
       self.failures = 0
       self.errors = 0
       self.skips = 0
       self.failure_details = []
       self.suites = {}
+      self.timings = []
     end
 
     # Adds to the failure details that we know about
     def append_failure_details(klass, meth)
-      failure_details << { :class => klass.to_s, :method => meth.to_s }
+      self.failure_details << { :class => klass.to_s, :method => meth.to_s }
     end
 
     # Records that we've encountered a particular suite. Returns true
@@ -37,6 +41,10 @@ module TConsole
         suites[suite.to_s] = true
         true
       end
+    end
+
+    def add_timing(suite, method, time)
+      self.timings << { :suite => suite.to_s, :method => method.to_s, :time => time }
     end
   end
 end

@@ -101,7 +101,7 @@ module TConsole
   end
 
   class Console
-    KNOWN_COMMANDS = ["exit", "reload", "help", "units", "functionals", "integration", "recent", "uncommitted", "all", "info", "!failed"]
+    KNOWN_COMMANDS = ["exit", "reload", "help", "units", "functionals", "integration", "recent", "uncommitted", "all", "info", "!failed", "!timings"]
 
     def initialize
       read_history
@@ -138,6 +138,8 @@ module TConsole
           server.run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"], args[1])
         elsif args[0] == "!failed"
           server.run_failed
+        elsif args[0] == "!timings"
+          server.show_performance(args[1])
         elsif args[0] == "info"
           server.run_info
         else
@@ -160,6 +162,7 @@ module TConsole
       puts "recent [test_pattern]       # Run tests for recently changed files"
       puts "uncommitted [test_pattern]  # Run tests for uncommitted changes"
       puts "!failed                     # Runs the last set of failing tests"
+      puts "!timings                    # Lists the timings for the last test run, sorted."
       puts "[filename] [test_pattern]   # Run the tests contained in the given file"
       puts "reload                      # Reload your Rails environment"
       puts "exit                        # Exit the console"

@@ -93,6 +93,9 @@ module TConsole
         begin
           self.last_result = Marshal.load(response.unpack("m")[0])
         rescue
+          puts "ERROR: Unable to process test results."
+          puts
+
           # Just in case anything crazy goes down with marshalling
           self.last_result = TConsole::TestResult.new
         end
@@ -176,6 +179,28 @@ module TConsole
       puts "Defined Constants:"
       puts Module.constants.sort.join("\n")
       puts
+      puts
+    end
+
+    def show_performance(limit = nil)
+
+      limit = limit.to_i
+      limit = last_result.timings.length if limit == 0
+
+      sorted_timings = last_result.timings.sort_by { |timing| timing[:time] }
+
+      puts
+      puts "Timings from last run:"
+      puts
+
+      if sorted_timings.length == 0
+        puts "No timing data available. Be sure you've run some tests."
+      else
+        sorted_timings.reverse[0, limit].each do |timing|
+          puts "#{timing[:time]}s #{timing[:suite]}##{timing[:method]}"
+        end
+      end
+
       puts
     end
 

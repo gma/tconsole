@@ -1,6 +1,7 @@
 require "tconsole/version"
 require "tconsole/server"
 require "tconsole/test_result"
+require "tconsole/util"
 
 require "readline"
 require "benchmark"

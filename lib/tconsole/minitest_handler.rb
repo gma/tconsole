@@ -49,6 +49,29 @@ module TConsole
       super
     end
 
+    def _run_suite(suite, type)
+      filter = options[:filter] || '/./'
+      filter = Regexp.new $1 if filter =~ /\/(.*)\//
+
+      assertions = suite.send("#{type}_methods").grep(filter).map { |method|
+        inst = suite.new method
+        inst._assertions = 0
+
+        # Print the suite name if needed
+        puts suite if results.add_suite(suite)
+
+        @start_time = Time.now
+        result = inst.run self
+        time = Time.now - @start_time
+
+        print result
+
+        inst._assertions
+      }
+
+      return assertions.size, assertions.inject(0) { |sum, n| sum + n }
+    end
+
     def puke(klass, meth, e)
       e = case e
           when MiniTest::Skip then
@@ -73,5 +96,3 @@ module TConsole
     end
   end
 end
-
-

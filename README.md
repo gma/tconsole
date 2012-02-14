@@ -29,6 +29,10 @@ willing to merge it in, though.
 Installing tconsole
 ------
 	gem install tconsole
+	
+Prereleases of tconsole come out pretty frequently. You can install the latest prerelease version with:
+	
+	gem installt console --pre
 
 How to use tconsole
 ------
@@ -72,12 +76,12 @@ If you want to focus in on a particular subset of your tests, like units, functi
 If you'd like to just run the tests that are related to recent changes
 you've made:
 
-  > recent
+	> recent
 
 Or if you'd like to run the tests for changes you've made since your
 last commit:
 
-  > uncommitted
+	> uncommitted
 
 You can also focus in on just the tests in a given filename by entering a test file name into tconsole:
 
@@ -91,6 +95,32 @@ with an extra argument:
 That command will load up the user_test.rb file and then only run the
 test named test_that_user_is_healthy. You can add a specific test name
 argument to any tconsole command that runs tests.
+
+There are a few special ! commands that use data from past test runs. The `!failed` command will rerun all of your files
+that included failing tests in the last test run:
+
+	> !failed
+	
+There's also a `!timings` command that will show you a listing of your last test run's test times, sorted to help you
+improve slow tests:
+
+	> !timings
+
+	Timings from last run:
+
+	0.042632s PostTest#test_new_post_should_not_be_published
+	0.033892s PostTest#test_post_should_have_a_title
+	0.033134s PostsControllerTest#test_can_reach_all_posts
+	0.007098s PostsControllerTest#test_grabs_posts
+	0.006212s PostsControllerTest#test_displays_published_posts_by_default
+	0.006107s PostTest#test_post_cannot_have_an_empty_body
+	0.002197s PostTest#test_post_should_have_a_publish_date_set_when_published
+	0.001937s PostTest#test_post_cannot_have_an_empty_title
+	0.001232s PostTest#test_post_should_have_an_initial_state
+	0.001128s PostTest#test_post's_state_should_change_when_published
+	0.001056s PostTest#test_returning_only_published_posts
+	0.000923s PostTest#test_post_should_have_respond_to_published_appropriately
+	0.00077s PostTest#test_post_should_have_a_body
 
 If you update your environment, maybe by editing your Gemfile or changing one of your application's configuration files, you can use the `reload` command to reload the entire environment:
 

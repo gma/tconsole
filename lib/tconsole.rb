@@ -49,7 +49,7 @@ module TConsole
       config = Config.configure
       config.trace_execution = true if argv.include?("--trace")
 
-      socket_path = "/tmp/tconsole.#{Process.pid}"
+      port = "1233"
 
       # Start the server
       while running
@@ -60,24 +60,19 @@ module TConsole
           begin
             server = Server.new(config)
 
-            drb_server = DRb.start_service("drbunix:#{socket_path}", server)
+            drb_server = DRb.start_service("druby://localhost:#{port}", server)
             DRb.thread.join
           rescue Interrupt
             # do nothing here since the outer process will shut things down for us
           end
         end
 
-        # Wait for the server to be fully started
         wait_until = Time.now + 10
-        until(File.exist?(socket_path) || Time.now > wait_until)
-          config.trace("Waiting on DRb socket to become available.")
-          sleep(1)
-        end
 
         # Set up our client connection to the server
         config.trace("Connecting to testing server.")
         DRb.start_service
-        server = DRbObject.new_with_uri("drbunix:#{socket_path}")
+        server = DRbObject.new_with_uri("druby://localhost:#{port}")
 
         loaded = false
         until loaded || Time.now > wait_until

@@ -68,17 +68,25 @@ module TConsole
           end
 
           paths.each do |path|
+            config.trace("Requested path `#{path}` doesn't exist.") unless File.exist?(path)
             require File.expand_path(path)
           end
 
+          config.trace("Running before_test_run callback")
           config.before_test_run!
+          config.trace("Completed before_test_run callback")
 
           if defined?(::MiniTest)
+            config.trace("Detected minitest.")
             require File.join(File.dirname(__FILE__), "minitest_handler")
 
+            config.trace("Running tests.")
             result = MiniTestHandler.run(name_pattern, config)
+            config.trace("Finished running tests.")
 
+            config.trace("Writing test results back to server.")
             write.puts([Marshal.dump(result)].pack("m"))
+            config.trace("Finished writing test results to server.")
 
           elsif defined?(::Test::Unit)
             puts "Sorry, but tconsole doesn't support Test::Unit yet"
@@ -92,8 +100,16 @@ module TConsole
         write.close
         response = read.read
         begin
+          config.trace("Reading test results from console.")
           self.last_result = Marshal.load(response.unpack("m")[0])
-        rescue
+          config.trace("Finished reading test results from console.")
+        rescue => e
+          config.trace("Exception: #{e.message}")
+          config.trace("==== Backtrace ====")
+          config.trace(e.backtrace.join("\n"))
+          config.trace("==== End Backtrace ====")
+
+
           puts "ERROR: Unable to process test results."
           puts
 

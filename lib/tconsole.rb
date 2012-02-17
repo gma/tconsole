@@ -47,7 +47,7 @@ module TConsole
 
       # set up the config
       config = Config.configure
-      config.trace = true if argv.include?("--trace")
+      config.trace_execution = true if argv.include?("--trace")
 
       socket_path = "/tmp/tconsole.#{Process.pid}"
 
@@ -55,6 +55,7 @@ module TConsole
       while running
         # ignore ctrl-c during load, since things can get kind of messy if we don't
 
+        config.trace("Forking test server.")
         server_pid = fork do
           begin
             server = Server.new(config)
@@ -69,27 +70,34 @@ module TConsole
         # Wait for the server to be fully started
         wait_until = Time.now + 10
         until(File.exist?(socket_path) || Time.now > wait_until)
+          config.trace("Waiting on DRb socket to become available.")
           sleep(1)
         end
 
         # Set up our client connection to the server
+        config.trace("Connecting to testing server.")
         DRb.start_service
         server = DRbObject.new_with_uri("drbunix:#{socket_path}")
 
         loaded = false
         until loaded || Time.now > wait_until
-          # Give drb a second to get set up
-          sleep(1)
-
           begin
+            config.trace("Attempting to load environment.")
             running = server.load_environment
             loaded = true
-          rescue
+          rescue => e
+            config.trace("Could not load environment: #{e.message}")
+            config.trace("==== Backtrace ====")
+            config.trace(e.backtrace.join("\n"))
+            config.trace("==== End Backtrace ====")
             loaded = false
           rescue Interrupt
             # do nothing if we get an interrupt
             puts "Interrupted in client"
           end
+
+          # Give drb a second to get set up
+          sleep(1)
         end
 
         if !loaded
@@ -97,6 +105,7 @@ module TConsole
           puts "Couldn't connect to test environment. Exiting."
           exit(1)
         end
+        config.trace("Environment loaded successfully.")
 
         running = console.read_and_execute(server) if running
 

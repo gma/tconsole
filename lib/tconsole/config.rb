@@ -1,7 +1,7 @@
 module TConsole
   class Config
     # Lets us know if we should include trace output
-    attr_accessor :trace
+    attr_accessor :trace_execution
 
     # Test directory for the app we're testing
     attr_accessor :test_dir
@@ -13,7 +13,7 @@ module TConsole
     attr_accessor :preload_paths
 
     def initialize
-      self.trace = false
+      self.trace_execution = false
       self.test_dir = "./test"
       self.include_paths = ["./test", "./lib"]
       self.preload_paths = []
@@ -22,7 +22,7 @@ module TConsole
     end
 
     def trace?
-      self.trace
+      self.trace_execution
     end
 
     # Code to run before loading the environment
@@ -89,6 +89,11 @@ module TConsole
 
     def self.is_rails?
       @rails ||= !!File.exist?("./config/application.rb")
+    end
+
+    # Outputs trace message if our config allows it
+    def trace(message)
+      puts "[tconsole trace] #{message}" if trace?
     end
   end
 end

@@ -150,7 +150,6 @@ module TConsole
     end
 
     def run_failed
-      # TODO: We probably shouldn't use built in Rails methods here if we can help it
       file_names = last_result.failure_details.map { |detail| filenameify(detail[:class]) }
       files_to_rerun = []
 
@@ -250,6 +249,16 @@ module TConsole
       end
 
       result
+    end
+
+    # Totally yanked from the Rails test tasks
+    def silence_stderr
+      old_stderr = STDERR.dup
+      STDERR.reopen(RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ ? 'NUL:' : '/dev/null')
+      STDERR.sync = true
+      yield
+    ensure
+      STDERR.reopen(old_stderr)
     end
   end
 end

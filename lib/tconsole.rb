@@ -65,6 +65,7 @@ module TConsole
         end
 
         # Set up our client connection to the server
+        DRb.start_service
         server = DRbObject.new_with_uri("drbunix:/tmp/tconsole.#{server_pid}")
 
         loaded = false

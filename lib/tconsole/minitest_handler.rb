@@ -1,6 +1,6 @@
 module TConsole
   class MiniTestHandler
-    def self.run(name_pattern)
+    def self.run(name_pattern, config)
       args = []
       unless name_pattern.nil?
         args = ["--name", name_pattern]
@@ -8,7 +8,7 @@ module TConsole
 
       # Make sure we have a recent version of minitest, and use it
       if ::MiniTest::Unit.respond_to?(:runner=)
-        ::MiniTest::Unit.runner = TConsole::MiniTestUnit.new
+        ::MiniTest::Unit.runner = TConsole::MiniTestUnit.new(config)
       else
         raise "MiniTest v#{MiniTest::Unit::VERSION} is not compatible with tconsole. Please load a more recent version of MiniTest"
       end
@@ -48,12 +48,13 @@ module TConsole
       "P" => ::Term::ANSIColor.green
     }
 
-    attr_accessor :results
+    attr_accessor :config, :results
 
-    def initialize
+    def initialize(config)
+      self.config = config
       self.results = TConsole::TestResult.new
 
-      super
+      super()
     end
 
     def _run_anything(type)
@@ -95,30 +96,45 @@ module TConsole
     end
 
     def _run_suite(suite, type)
+      @failed_fast ||= false
+
       filter = options[:filter] || '/./'
       filter = Regexp.new $1 if filter =~ /\/(.*)\//
 
-      assertions = suite.send("#{type}_methods").grep(filter).map { |method|
-        inst = suite.new method
-        inst._assertions = 0
+      assertions = suite.send("#{type}_methods").grep(filter).map do |method|
+        if @failed_fast
+          0
+        else
+          inst = suite.new method
+          inst._assertions = 0
 
-        # Print the suite name if needed
-        if results.add_suite(suite)
-          print("\n\n", ::Term::ANSIColor.cyan, suite, ::Term::ANSIColor.reset, "\n")
+          # Print the suite name if needed
+          if results.add_suite(suite)
+            print("\n\n", ::Term::ANSIColor.cyan, suite, ::Term::ANSIColor.reset, "\n")
+          end
+
+          @start_time = Time.now
+          result = inst.run self
+          time = Time.now - @start_time
+          results.add_timing(suite, method, time)
+
+          result = "P" if result == "."
+
+          if config.fail_fast && result != "P"
+            @failed_fast = true
+          end
+
+          output = "#{result} #{method}"
+
+          print COLOR_MAP[result], " #{output}", ::Term::ANSIColor.reset, " #{time}s\n"
+
+          if @failed_fast
+            print "\n", COLOR_MAP["E"], "Halting tests because of failure.", ::Term::ANSIColor.reset, "\n"
+          end
+
+          inst._assertions
         end
-
-        @start_time = Time.now
-        result = inst.run self
-        time = Time.now - @start_time
-        results.add_timing(suite, method, time)
-
-        result = "P" if result == "."
-        output = "#{result} #{method}"
-
-        print COLOR_MAP[result], " #{output}", ::Term::ANSIColor.reset, " #{time}s\n"
-
-        inst._assertions
-      }
+      end
 
       return assertions.size, assertions.inject(0) { |sum, n| sum + n }
     end

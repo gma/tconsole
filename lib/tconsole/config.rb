@@ -3,16 +3,23 @@ module TConsole
     # Lets us know if we should include trace output
     attr_accessor :trace_execution
 
-    # Test directory for the app we're testing
+    # Lets us know if we should include trace output.
+    # Defaults to false.
+    attr_accessor :trace
+
+    # Test directory for the app we're testing.
+    # Defaults to ./test.
     attr_accessor :test_dir
 
-    # Paths to add to the ruby include path
+    # Paths to add to the ruby include path.
+    # Defaults to ./test, ./lib
     attr_accessor :include_paths
 
-    # Paths we want to preload
+    # Paths we want to preload. Defaults to nil.
     attr_accessor :preload_paths
 
-    # Whether or not tests should fail fast
+    # Whether or not our test runs should stop when the first
+    # test fails. Defaults to false.
     attr_accessor :fail_fast
 
     def initialize
@@ -20,11 +27,19 @@ module TConsole
       self.test_dir = "./test"
       self.include_paths = ["./test", "./lib"]
       self.preload_paths = []
-      self.fail_fast = true
+      self.fail_fast = false
+
+      @after_load = nil
+      @before_load = nil
+      @before_test_run = nil
     end
 
     def trace?
       self.trace_execution
+    end
+
+    def fail_fast?
+      self.fail_fast
     end
 
     # Code to run before loading the environment

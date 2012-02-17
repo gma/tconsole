@@ -1,4 +1,5 @@
 require "tconsole/version"
+require "tconsole/config"
 require "tconsole/server"
 require "tconsole/test_result"
 require "tconsole/util"
@@ -45,8 +46,8 @@ module TConsole
       console = Console.new
 
       # set up the config
-      config = {:trace => false}
-      config[:trace] = true if argv.include?("--trace")
+      config = Config.new
+      config.trace = true if argv.include?("--trace")
 
       # Start the server
       while running

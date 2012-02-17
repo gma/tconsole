@@ -24,7 +24,7 @@ module TConsole
           end
         rescue Exception => e
           puts "Error - Loading your environment failed: #{e.message}"
-          if config[:trace] == true
+          if config.trace?
             puts
             puts "    #{e.backtrace.join("\n    ")}"
           end

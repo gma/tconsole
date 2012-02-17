@@ -90,7 +90,6 @@ module TConsole
           globs.each do |glob|
             paths.concat(Dir.glob(glob))
           end
-          puts "Paths: #{paths.join(", ")}"
 
           paths.each do |path|
             require File.expand_path(path)

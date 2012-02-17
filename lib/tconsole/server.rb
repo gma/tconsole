@@ -76,7 +76,7 @@ module TConsole
           if defined?(::MiniTest)
             require File.join(File.dirname(__FILE__), "minitest_handler")
 
-            result = MiniTestHandler.run(name_pattern)
+            result = MiniTestHandler.run(name_pattern, config)
 
             write.puts([Marshal.dump(result)].pack("m"))
 

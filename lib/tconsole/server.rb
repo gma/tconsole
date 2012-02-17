@@ -15,13 +15,25 @@ module TConsole
       result = false
 
       time = Benchmark.realtime do
+        puts
+        puts "Loading environment..."
 
         begin
-          if is_rails?
-            result = load_rails_environment
-          else
-            result = load_non_rails_environment
+          # Append our include paths
+          config.include_paths.each do |include_path|
+            $:.unshift(include_path)
           end
+
+          config.before_load!
+
+          # Load our preload files
+          config.preload_paths.each do |preload_path|
+            require preload_path
+          end
+
+          config.after_load!
+
+          result = true
         rescue Exception => e
           puts "Error - Loading your environment failed: #{e.message}"
           if config.trace?
@@ -37,42 +49,6 @@ module TConsole
       puts
 
       result
-    end
-
-    def is_rails?
-      @rails ||= !!File.exist?("./config/application.rb")
-    end
-
-    def load_rails_environment
-      puts
-      puts "Loading Rails environment..."
-
-      # Ruby environment loading is shamelessly borrowed from spork
-      ENV["RAILS_ENV"] ||= "test"
-      $:.unshift("./test")
-
-      # This is definitely based on Sporks rails startup code. I tried initially to use Rake to get things done
-      # and match the test environment a bit better, but it didn't work out well at all
-      # TODO: Figure out how ot get rake db:test:load and rake test:prepare working in this context
-      require "./config/application"
-      ::Rails.application
-      ::Rails::Engine.class_eval do
-        def eager_load!
-          # turn off eager_loading
-        end
-      end
-
-      true
-    end
-
-    def load_non_rails_environment
-      $:.unshift("./lib")
-      $:.unshift("./test")
-
-      puts
-      puts "Loading environment..."
-
-      true
     end
 
     def run_tests(globs, name_pattern, message = "Running tests...")
@@ -95,10 +71,7 @@ module TConsole
             require File.expand_path(path)
           end
 
-          if defined? ::ActiveRecord
-            ::ActiveRecord::Base.clear_active_connections!
-            ::ActiveRecord::Base.establish_connection
-          end
+          config.before_test_run!
 
           if defined?(::MiniTest)
             require File.join(File.dirname(__FILE__), "minitest_handler")

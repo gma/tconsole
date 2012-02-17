@@ -46,7 +46,7 @@ module TConsole
       console = Console.new
 
       # set up the config
-      config = Config.new
+      config = Config.configure
       config.trace = true if argv.include?("--trace")
 
       # Start the server

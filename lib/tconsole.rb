@@ -56,7 +56,7 @@ module TConsole
           begin
             server = Server.new(config)
 
-            drb_server = DRb.start_service("drbunix://tmp/tconsole.#{Process.pid}", server)
+            drb_server = DRb.start_service("drbunix:/tmp/tconsole.#{Process.pid}", server)
             DRb.thread.join
           rescue Interrupt
             # do nothing here since the outer process will shut things down for us
@@ -64,11 +64,14 @@ module TConsole
         end
 
         # Set up our client connection to the server
-        server = DRbObject.new_with_uri("drbunix://tmp/tconsole.#{server_pid}")
+        server = DRbObject.new_with_uri("drbunix:/tmp/tconsole.#{server_pid}")
 
         loaded = false
         wait_until = Time.now + 10
         until loaded || Time.now > wait_until
+          # Give drb a second to get set up
+          sleep(1)
+
           begin
             running = server.load_environment
             loaded = true

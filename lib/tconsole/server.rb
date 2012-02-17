@@ -12,23 +12,15 @@ module TConsole
     end
 
     def load_environment
-      puts
-      puts "Loading Rails environment..."
-      time = Benchmark.realtime do
-        begin
-          # Ruby environment loading is shamelessly borrowed from spork
-          ENV["RAILS_ENV"] ||= "test"
-          $:.unshift("./test")
+      result = false
 
-          # This is definitely based on Sporks rails startup code. I tried initially to use Rake to get things done
-          # and match the test environment a bit better, but it didn't work out well at all
-          # TODO: Figure out how ot get rake db:test:load and rake test:prepare working in this context
-          require "./config/application"
-          ::Rails.application
-          ::Rails::Engine.class_eval do
-            def eager_load!
-              # turn off eager_loading, all together
-            end
+      time = Benchmark.realtime do
+
+        begin
+          if is_rails?
+            result = load_rails_environment
+          else
+            result = load_non_rails_environment
           end
         rescue Exception => e
           puts "Error - Loading your environment failed: #{e.message}"
@@ -44,7 +36,43 @@ module TConsole
       puts "Environment loaded in #{time}s."
       puts
 
-      return true
+      result
+    end
+
+    def is_rails?
+      @rails ||= !!File.exist?("./config/application.rb")
+    end
+
+    def load_rails_environment
+      puts
+      puts "Loading Rails environment..."
+
+      # Ruby environment loading is shamelessly borrowed from spork
+      ENV["RAILS_ENV"] ||= "test"
+      $:.unshift("./test")
+
+      # This is definitely based on Sporks rails startup code. I tried initially to use Rake to get things done
+      # and match the test environment a bit better, but it didn't work out well at all
+      # TODO: Figure out how ot get rake db:test:load and rake test:prepare working in this context
+      require "./config/application"
+      ::Rails.application
+      ::Rails::Engine.class_eval do
+        def eager_load!
+          # turn off eager_loading
+        end
+      end
+
+      true
+    end
+
+    def load_non_rails_environment
+      $:.unshift("./lib")
+      $:.unshift("./test")
+
+      puts
+      puts "Loading environment..."
+
+      true
     end
 
     def run_tests(globs, name_pattern, message = "Running tests...")
@@ -62,6 +90,7 @@ module TConsole
           globs.each do |glob|
             paths.concat(Dir.glob(glob))
           end
+          puts "Paths: #{paths.join(", ")}"
 
           paths.each do |path|
             require File.expand_path(path)

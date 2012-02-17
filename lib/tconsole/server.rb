@@ -204,6 +204,23 @@ module TConsole
       puts
     end
 
+    def set(key, value)
+      if key == "fast"
+        value.downcase!
+        if value == "on" || value == "true" || value == "yes"
+          config.fail_fast = true
+        else
+          config.fail_fast = false
+        end
+
+        puts "Fail Fast is now #{config.fail_fast ? "on" : "off"}"
+        puts
+      else
+        puts "#{key} isn't an available runtime setting."
+        puts
+      end
+    end
+
     def filenameify(klass_name)
       result = ""
       first = true

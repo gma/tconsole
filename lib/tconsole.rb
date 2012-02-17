@@ -122,7 +122,7 @@ module TConsole
   end
 
   class Console
-    KNOWN_COMMANDS = ["exit", "reload", "help", "units", "functionals", "integration", "recent", "uncommitted", "all", "info", "!failed", "!timings"]
+    KNOWN_COMMANDS = ["exit", "reload", "help", "units", "functionals", "integration", "recent", "uncommitted", "all", "info", "!failed", "!timings", "set"]
 
     def initialize
       read_history
@@ -163,6 +163,8 @@ module TConsole
           server.show_performance(args[1])
         elsif args[0] == "info"
           server.run_info
+        elsif args[0] == "set"
+          server.set(args[1], args[2])
         else
           server.run_tests([args[0]], args[1])
         end
@@ -186,6 +188,7 @@ module TConsole
       puts "!timings [limit]            # Lists the timings for the last test run, sorted."
       puts "[filename] [test_pattern]   # Run the tests contained in the given file"
       puts "reload                      # Reload your Rails environment"
+      puts "set [variable] [value]      # Sets a runtime variable (see below for details)"
       puts "exit                        # Exit the console"
       puts
       puts "Working with test patterns:"
@@ -195,6 +198,15 @@ module TConsole
       puts "name matches the pattern given. This is especially useful when rerunning a failing"
       puts "test."
       puts
+      puts "Runtime Variables"
+      puts
+      puts "You can set runtime variables with the set command. This helps out with changing"
+      puts "features of TConsole that you may want to change at runtime. At present, the"
+      puts "following runtime variables are available:"
+      puts
+      puts "fast        # Turns on fail fast mode. Values: on, off"
+      puts
+
     end
 
     def history_file

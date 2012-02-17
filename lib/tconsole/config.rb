@@ -12,13 +12,15 @@ module TConsole
     # Paths we want to preload
     attr_accessor :preload_paths
 
+    # Whether or not tests should fail fast
+    attr_accessor :fail_fast
+
     def initialize
       self.trace_execution = false
       self.test_dir = "./test"
       self.include_paths = ["./test", "./lib"]
       self.preload_paths = []
-
-      @after_load = nil
+      self.fail_fast = true
     end
 
     def trace?

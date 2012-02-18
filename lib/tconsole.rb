@@ -16,7 +16,7 @@ Readline.completion_proc = Proc.new do |str|
   known_commands = TConsole::Console::KNOWN_COMMANDS.grep(/^#{Regexp.escape(str)}/)
 
   files = Dir[str+'*'].grep(/^#{Regexp.escape(str)}/)
-  formatted_files = files.collect do |filename| 
+  formatted_files = files.collect do |filename|
     if File.directory?(filename)
       filename + File::SEPARATOR
     else
@@ -89,10 +89,10 @@ module TConsole
           rescue Interrupt
             # do nothing if we get an interrupt
             puts "Interrupted in client"
-          end
 
-          # Give drb a second to get set up
-          sleep(1)
+            # Give drb a second to get set up
+            sleep(1)
+          end
         end
 
         if !loaded

@@ -83,14 +83,14 @@ module TConsole
         config = Config.new
         config.preload_paths = ["./config/application"]
         config.include_paths = ["./test"]
-        config.test_sets = {
-          "all" => ["#{test_dir}/unit/**/*_test.rb", "#{test_dir}/functional/**/*_test.rb",
-            "#{test_dir}/integration/**/*_test.rb"],
-          "units" => ["#{test_dir}/unit/**/*_test.rb"],
-          "unit" => ["#{test_dir}/unit/**/*_test.rb"],
-          "functionals" => ["#{test_dir}/functional/**/*_test.rb"],
-          "functional" => ["#{test_dir}/functional/**/*_test.rb"],
-          "integration" => ["#{test_dir}/integration/**/*_test.rb"]
+        config.file_sets = {
+          "all" => ["#{config.test_dir}/unit/**/*_test.rb", "#{config.test_dir}/functional/**/*_test.rb",
+            "#{config.test_dir}/integration/**/*_test.rb"],
+          "units" => ["#{config.test_dir}/unit/**/*_test.rb"],
+          "unit" => ["#{config.test_dir}/unit/**/*_test.rb"],
+          "functionals" => ["#{config.test_dir}/functional/**/*_test.rb"],
+          "functional" => ["#{config.test_dir}/functional/**/*_test.rb"],
+          "integration" => ["#{config.test_dir}/integration/**/*_test.rb"]
         }
 
 

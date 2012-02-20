@@ -66,15 +66,15 @@ module TConsole
       puts "set [variable] [value]      # Sets a runtime variable (see below for details)"
       puts "exit                        # Exit the console"
       puts
-      puts "Running test sets"
+      puts "Running file sets"
       puts
-      puts "Test sets are sets of files that are typically run together. For example,"
+      puts "File sets are sets of files that are typically run together. For example,"
       puts "in Rails projects it's common to run `rake test:units` to run all of the"
-      puts "tests in the units directory."
+      puts "tests under the units directory."
       puts
-      puts "Available test sets:"
+      puts "Available file sets:"
 
-      @config.test_sets.each do |set, paths|
+      @config.file_sets.each do |set, paths|
         puts set
       end
 

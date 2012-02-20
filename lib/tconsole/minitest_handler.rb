@@ -1,21 +1,16 @@
 module TConsole
   class MiniTestHandler
-    def self.run(name_pattern, config)
-      args = []
-      unless name_pattern.nil?
-        args = ["--name", name_pattern]
-      end
-
+    def self.run(match_patterns, config)
       # Make sure we have a recent version of minitest, and use it
       if ::MiniTest::Unit.respond_to?(:runner=)
-        ::MiniTest::Unit.runner = TConsole::MiniTestUnit.new(config)
+        ::MiniTest::Unit.runner = TConsole::MiniTestUnit.new(match_patterns, config)
       else
         raise "MiniTest v#{MiniTest::Unit::VERSION} is not compatible with tconsole. Please load a more recent version of MiniTest"
       end
 
       # Run it
       runner = MiniTest::Unit.runner
-      runner.run(args)
+      runner.run
 
       # Make sure that minitest doesn't run automatically when the process exits
       patch_minitest
@@ -48,9 +43,12 @@ module TConsole
       "P" => ::Term::ANSIColor.green
     }
 
-    attr_accessor :config, :results
+    attr_accessor :match_patterns, :config, :results
 
-    def initialize(config)
+    def initialize(match_patterns, config)
+      self.match_patterns = match_patterns
+      self.match_patterns = [] unless self.match_patterns.is_a?(Array)
+
       self.config = config
       self.results = TConsole::TestResult.new
 
@@ -102,22 +100,33 @@ module TConsole
       @last_suite ||= nil
       @failed_fast ||= false
 
-      filter = options[:filter] || '/./'
-      filter = Regexp.new $1 if filter =~ /\/(.*)\//
+      assertions = suite.send("#{type}_methods").map do |method|
+        skip = false
 
-      assertions = suite.send("#{type}_methods").grep(filter).map do |method|
-        if @failed_fast
+        # Get our unique id for this particular element
+        id = results.add_element(suite, method)
+        suite_id = results.elements[suite.to_s]
+
+        # If we're using failed fast mode and we already failed, just return
+        skip = true if @failed_fast
+
+        # If we've got match patterns, see if this matches them
+        if !match_patterns.empty?
+          match = match_patterns.find do |pattern|
+            pattern == suite.to_s || pattern == "#{suite.to_s}##{method.to_s}" || pattern == suite_id || pattern == id
+          end
+
+          skip = true unless match
+        end
+
+        if skip
           0
         else
           inst = suite.new method
           inst._assertions = 0
 
-          # Get our unique id for this particular element
-          id = results.add_element(suite, method)
-
           # Print the suite name if needed
           unless @last_suite == suite
-            suite_id = results.elements[suite.to_s]
             print("\n\n", ::Term::ANSIColor.cyan, suite, ::Term::ANSIColor.reset,
                   ::Term::ANSIColor.magenta, " #{suite_id}", ::Term::ANSIColor.reset, "\n")
             @last_suite = suite
@@ -129,6 +138,8 @@ module TConsole
           results.add_timing(suite, method, time)
 
           result = "P" if result == "."
+
+          results.failures << id unless result == "P"
 
           if config.fail_fast && result != "P"
             @failed_fast = true
@@ -160,12 +171,10 @@ module TConsole
           when MiniTest::Assertion then
             @failures += 1
             results.failures += 1
-            results.append_failure_details(klass, meth)
             "Failure:\n#{meth}(#{klass}) [#{location e}]:\n#{e.message}\n"
           else
             @errors += 1
             results.errors += 1
-            results.append_failure_details(klass, meth)
             bt = MiniTest::filter_backtrace(e.backtrace).join "\n    "
             "Error:\n#{meth}(#{klass}):\n#{e.class}: #{e.message}\n    #{bt}\n"
           end

@@ -59,8 +59,7 @@ module TConsole
         elsif @config.file_sets.has_key?(args[0])
           server.run_file_set(args[0])
         else
-          puts args[0]
-          server.run_tests([args[0]], args[1])
+          server.run_all_tests(args)
         end
       end
 

@@ -28,17 +28,12 @@ module TConsole
       self.failures = 0
       self.errors = 0
       self.skips = 0
-      self.failure_details = []
+      self.failures = []
       self.suites = {}
       self.timings = []
 
       self.suite_counts = {}
       self.elements = {}
-    end
-
-    # Adds to the failure details that we know about
-    def append_failure_details(klass, meth)
-      self.failure_details << { :class => klass.to_s, :method => meth.to_s }
     end
 
     def add_element(suite, method)

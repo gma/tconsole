@@ -51,7 +51,9 @@ module TConsole
       result
     end
 
-    def run_tests(globs, name_pattern, message = "Running tests...")
+    # Loads the files that match globs and then executes tests against them. Limit tests
+    # with class names, method names, and test ids using match_patterns.
+    def run_tests(globs, match_patterns, message = "Running tests...")
       time = Benchmark.realtime do
         # Pipe for communicating with child so we can get its results back
         read, write = IO.pipe
@@ -81,7 +83,7 @@ module TConsole
             require File.join(File.dirname(__FILE__), "minitest_handler")
 
             config.trace("Running tests.")
-            result = MiniTestHandler.run(name_pattern, config)
+            result = MiniTestHandler.run(match_patterns, config)
             config.trace("Finished running tests.")
 
             config.trace("Writing test results back to server.")
@@ -127,17 +129,18 @@ module TConsole
       puts
     end
 
+    # Runs all tests against the match patterns given
+    def run_all_tests(match_patterns = nil)
+      run_tests(config.file_sets["all"], match_patterns)
+    end
+
     # Runs a file set out of the config
     def run_file_set(set)
       run_tests(config.file_sets[set], nil)
     end
 
     def run_failed
-      file_names = last_result.failure_details.map { |detail| filenameify(detail[:class]) }
-      files_to_rerun = []
-
-      files_to_rerun << file_names.map {|file| (file.match(/controller/)) ? "test/functional/#{file}.rb" : "test/unit/#{file}.rb"}
-      run_tests(files_to_rerun, nil, "Running last failed tests: #{files_to_rerun.join(", ")}")
+      run_tests(config.file_sets["all"], last_result.failures)
     end
 
     def run_info

@@ -7,6 +7,11 @@ module TConsole
       self.last_result = TConsole::TestResult.new
     end
 
+    # Basically just a noop that helps us figure out if we're connected or not
+    def connected?
+      true
+    end
+
     def stop
       DRb.stop_service
     end

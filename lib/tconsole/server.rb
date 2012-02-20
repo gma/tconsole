@@ -127,6 +127,11 @@ module TConsole
       puts
     end
 
+    # Runs a file set out of the config
+    def run_file_set(set)
+      run_tests(config.file_sets[set], nil)
+    end
+
     # This code is from the rails test:recents command
     def run_recent(test_pattern)
       touched_since = Time.now - 600 # 10 minutes ago

@@ -1,20 +1,44 @@
 module TConsole
   class Console
-    KNOWN_COMMANDS = ["exit", "reload", "help", "units", "functionals", "integration", "recent", "uncommitted", "all", "info", "!failed", "!timings", "set"]
+    KNOWN_COMMANDS = ["exit", "reload", "help", "recent", "uncommitted", "info", "!failed", "!timings", "set"]
 
     def initialize(config)
       @config = config
       read_history
+
+      define_autocomplete
+    end
+
+    def define_autocomplete
+      Readline.completion_append_character = ""
+
+      # Proc for helping us figure out autocompletes
+      Readline.completion_proc = Proc.new do |str|
+        known_commands = KNOWN_COMMANDS.grep(/^#{Regexp.escape(str)}/)
+
+        files = Dir[str+'*'].grep(/^#{Regexp.escape(str)}/)
+        formatted_files = files.collect do |filename|
+          if File.directory?(filename)
+            filename + File::SEPARATOR
+          else
+            filename
+          end
+        end
+
+        known_commands.concat(formatted_files).concat(@config.file_sets.keys)
+      end
     end
 
     # Returns true if the app should keep running, false otherwise
     def read_and_execute(server)
       while line = Readline.readline("tconsole> ", false)
-        # TODO: Avoid pushing duplicate commands onto the history
-        Readline::HISTORY << line
-
         line.strip!
         args = line.split(/\s/)
+
+        # save the line unless we're exiting or repeating the last command
+        unless args[0] == "exit" || Readline::HISTORY[Readline::HISTORY.length - 1] == line
+          Readline::HISTORY << line
+        end
 
         if line == ""
           # do nothing
@@ -24,18 +48,10 @@ module TConsole
           return true
         elsif args[0] == "help"
           print_help
-        elsif args[0] == "units" || args[0] == "unit"
-          server.run_tests(["test/unit/**/*_test.rb"], args[1])
-        elsif args[0] == "functionals" || args[0] == "functional"
-          server.run_tests(["test/functional/**/*_test.rb"], args[1])
-        elsif args[0] == "integration"
-          server.run_tests(["test/integration/**/*_test.rb"], args[1])
         elsif args[0] == "recent"
           server.run_recent(args[1])
         elsif args[0] == "uncommitted"
           server.run_uncommitted(args[1])
-        elsif args[0] == "all"
-          server.run_tests(["test/unit/**/*_test.rb", "test/functional/**/*_test.rb", "test/integration/**/*_test.rb"], args[1])
         elsif args[0] == "!failed"
           server.run_failed
         elsif args[0] == "!timings"
@@ -44,6 +60,8 @@ module TConsole
           server.run_info
         elsif args[0] == "set"
           server.set(args[1], args[2])
+        elsif @config.file_sets.has_key?(args[0])
+          server.run_file_set(args[0])
         else
           server.run_tests([args[0]], args[1])
         end

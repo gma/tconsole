@@ -25,6 +25,12 @@ module TConsole
     # Defines the file set commands that are available
     attr_accessor :file_sets
 
+    # Counts of tests in suites
+    attr_accessor :cached_suite_counts
+
+    # Element names we know
+    attr_accessor :cached_elements
+
     def initialize
       self.trace_execution = false
       self.test_dir = "./test"
@@ -38,6 +44,9 @@ module TConsole
       @after_load = nil
       @before_load = nil
       @before_test_run = nil
+
+      @cached_suite_counts = {}
+      @cached_elements = {}
     end
 
     def trace?
@@ -75,6 +84,11 @@ module TConsole
 
     def before_test_run!
       @before_test_run.call unless @before_test_run.nil?
+    end
+
+    def cache_test_ids(result)
+      self.cached_suite_counts = result.suite_counts
+      self.cached_elements = result.elements
     end
 
     # Returns an appropriate tconsole config based on the environment

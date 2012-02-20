@@ -102,13 +102,13 @@ module TConsole
         begin
           config.trace("Reading test results from console.")
           self.last_result = Marshal.load(response.unpack("m")[0])
+          config.cache_test_ids(self.last_result)
           config.trace("Finished reading test results from console.")
         rescue => e
           config.trace("Exception: #{e.message}")
           config.trace("==== Backtrace ====")
           config.trace(e.backtrace.join("\n"))
           config.trace("==== End Backtrace ====")
-
 
           puts "ERROR: Unable to process test results."
           puts

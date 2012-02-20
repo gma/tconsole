@@ -54,6 +54,9 @@ module TConsole
       self.config = config
       self.results = TConsole::TestResult.new
 
+      results.suite_counts = config.cached_suite_counts
+      results.elements = config.cached_elements
+
       super()
     end
 
@@ -96,6 +99,7 @@ module TConsole
     end
 
     def _run_suite(suite, type)
+      @last_suite ||= nil
       @failed_fast ||= false
 
       filter = options[:filter] || '/./'
@@ -108,9 +112,15 @@ module TConsole
           inst = suite.new method
           inst._assertions = 0
 
+          # Get our unique id for this particular element
+          id = results.add_element(suite, method)
+
           # Print the suite name if needed
-          if results.add_suite(suite)
-            print("\n\n", ::Term::ANSIColor.cyan, suite, ::Term::ANSIColor.reset, "\n")
+          unless @last_suite == suite
+            suite_id = results.elements[suite.to_s]
+            print("\n\n", ::Term::ANSIColor.cyan, suite, ::Term::ANSIColor.reset,
+                  ::Term::ANSIColor.magenta, " #{suite_id}", ::Term::ANSIColor.reset, "\n")
+            @last_suite = suite
           end
 
           @start_time = Time.now
@@ -126,7 +136,8 @@ module TConsole
 
           output = "#{result} #{method}"
 
-          print COLOR_MAP[result], " #{output}", ::Term::ANSIColor.reset, " #{time}s\n"
+          print COLOR_MAP[result], " #{output}", ::Term::ANSIColor.reset, " #{time}s ",
+            ::Term::ANSIColor.magenta, "#{id}", ::Term::ANSIColor.reset, "\n"
 
           if @failed_fast
             print "\n", COLOR_MAP["E"], "Halting tests because of failure.", ::Term::ANSIColor.reset, "\n"

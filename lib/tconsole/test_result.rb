@@ -18,6 +18,12 @@ module TConsole
     # The timings for the tests we've run
     attr_accessor :timings
 
+    # The element id lookup hash
+    attr_accessor :elements
+
+    # Test counts within various suites
+    attr_accessor :suite_counts
+
     def initialize
       self.failures = 0
       self.errors = 0
@@ -25,6 +31,9 @@ module TConsole
       self.failure_details = []
       self.suites = {}
       self.timings = []
+
+      self.suite_counts = {}
+      self.elements = {}
     end
 
     # Adds to the failure details that we know about
@@ -32,15 +41,26 @@ module TConsole
       self.failure_details << { :class => klass.to_s, :method => meth.to_s }
     end
 
-    # Records that we've encountered a particular suite. Returns true
-    # if it's new or false otherwise.
-    def add_suite(suite)
-      if suites.has_key?(suite.to_s)
-        false
-      else
-        suites[suite.to_s] = true
-        true
+    def add_element(suite, method)
+      canonical_name = "#{suite}##{method}"
+
+      # Just return the id if we already know about this
+      if id = elements[canonical_name]
+        return id
       end
+
+      # See if we know about this suite already
+      unless suite_id = elements[suite.to_s]
+        suite_id = self.suite_counts.length + 1
+        elements[suite.to_s] = suite_id
+        suite_counts[suite.to_s] ||= 0
+      end
+
+      suite_counts[suite.to_s] += 1
+      id = "#{suite_id}-#{suite_counts[suite.to_s]}"
+      elements[canonical_name] = id
+
+      id
     end
 
     def add_timing(suite, method, time)

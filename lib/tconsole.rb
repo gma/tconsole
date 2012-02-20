@@ -43,12 +43,12 @@ module TConsole
       puts
       puts "Welcome to tconsole (v#{TConsole::VERSION}). Type 'help' for help or 'exit' to quit."
 
-      # Set up our console input handling and history
-      console = Console.new
-
       # set up the config
       config = Config.configure
       config.trace_execution = true if argv.include?("--trace")
+
+      # Set up our console input handling and history
+      console = Console.new(config)
 
       port = "1233"
 

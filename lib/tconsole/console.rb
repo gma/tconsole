@@ -2,7 +2,8 @@ module TConsole
   class Console
     KNOWN_COMMANDS = ["exit", "reload", "help", "units", "functionals", "integration", "recent", "uncommitted", "all", "info", "!failed", "!timings", "set"]
 
-    def initialize
+    def initialize(config)
+      @config = config
       read_history
     end
 
@@ -56,10 +57,6 @@ module TConsole
       puts
       puts "Available commands:"
       puts
-      puts "all [test_pattern]          # Run all test types (units, functionals, integration)"
-      puts "units [test_pattern]        # Run unit tests"
-      puts "functionals [test_pattern]  # Run functional tests"
-      puts "integration [test_pattern]  # Run integration tests"
       puts "recent [test_pattern]       # Run tests for recently changed files"
       puts "uncommitted [test_pattern]  # Run tests for uncommitted changes"
       puts "!failed                     # Runs the last set of failing tests"
@@ -68,6 +65,19 @@ module TConsole
       puts "reload                      # Reload your Rails environment"
       puts "set [variable] [value]      # Sets a runtime variable (see below for details)"
       puts "exit                        # Exit the console"
+      puts
+      puts "Running test sets"
+      puts
+      puts "Test sets are sets of files that are typically run together. For example,"
+      puts "in Rails projects it's common to run `rake test:units` to run all of the"
+      puts "tests in the units directory."
+      puts
+      puts "Available test sets:"
+
+      @config.test_sets.each do |set, paths|
+        puts set
+      end
+
       puts
       puts "Working with test patterns:"
       puts

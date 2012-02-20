@@ -9,6 +9,7 @@ require "readline"
 require "benchmark"
 require "drb/drb"
 require "term/ansicolor"
+require "shellwords"
 
 module TConsole
   class Runner

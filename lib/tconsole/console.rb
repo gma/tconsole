@@ -33,7 +33,7 @@ module TConsole
     def read_and_execute(server)
       while line = Readline.readline("tconsole> ", false)
         line.strip!
-        args = line.split(/\s/)
+        args = Shellwords.shellwords(line)
 
         # save the line unless we're exiting or repeating the last command
         unless args[0] == "exit" || Readline::HISTORY[Readline::HISTORY.length - 1] == line
@@ -59,6 +59,7 @@ module TConsole
         elsif @config.file_sets.has_key?(args[0])
           server.run_file_set(args[0])
         else
+          puts args[0]
           server.run_tests([args[0]], args[1])
         end
       end

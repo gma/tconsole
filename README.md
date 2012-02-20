@@ -29,9 +29,9 @@ willing to merge it in, though.
 Installing tconsole
 ------
 	gem install tconsole
-	
+
 Prereleases of tconsole come out pretty frequently. You can install the latest prerelease version with:
-	
+
 	gem installt console --pre
 
 How to use tconsole
@@ -39,68 +39,55 @@ How to use tconsole
 In your shell of choice, cd into your Rails project's directory and then run `bundle exec tconsole` to fire up the console. You should see something like this:
 
 	bundle exec tconsole
-	
+
 	Loading your Rails environment...
 	Environment loaded in 7.160264s.
-	
-	> 
-	
+
+	>
+
 Now that you're in the console, let's test out the all command! Running all from the console runs all of your unit, functional, and integration tests:
 
 	> all
 	Running tests...
-	
-	Run options: 
+
+	Run options:
 
 	# Running tests:
 
 	....................................................................................
-	
+
 	Finished tests in 6.054574s, 6.4999 tests/s, 10.5822 assertions/s.
 
 	39 tests, 45 assertions, 0 failures, 0 errors, 0 skips
 
 	Test time (including load): 82.806741s
-	
-	> 
-	
+
+	>
+
 If you want to focus in on a particular subset of your tests, like units, functionals, or integration, just enter that keyword:
 
 	> units
-         
+
 	> functionals
-         
+
 	> integration
-         
 
-If you'd like to just run the tests that are related to recent changes
-you've made:
+You can also specify to run all tests in a specific class:
 
-	> recent
+	> UserTest
 
-Or if you'd like to run the tests for changes you've made since your
-last commit:
+You can go one bit deeper and just run a particular test in that file as
+well:
 
-	> uncommitted
+	> UserTest#test_that_user_is_healthy
 
-You can also focus in on just the tests in a given filename by entering a test file name into tconsole:
+You can list more than just one class or class and method to run, and
+tconsole will run them all.
 
-	> test/unit/user_test.rb
-
-You can go one bit deeper and just run a particular test in that file
-with an extra argument:
-
-	> test/unit/user_test.rb test_that_user_is_healthy
-
-That command will load up the user_test.rb file and then only run the
-test named test_that_user_is_healthy. You can add a specific test name
-argument to any tconsole command that runs tests.
-
-There are a few special ! commands that use data from past test runs. The `!failed` command will rerun all of your files
-that included failing tests in the last test run:
+There are a few special ! commands that use data from past test runs. The `!failed` command will rerun the set of tests that failed during the last run:
 
 	> !failed
-	
+
 There's also a `!timings` command that will show you a listing of your last test run's test times, sorted to help you
 improve slow tests:
 
@@ -125,11 +112,11 @@ improve slow tests:
 If you update your environment, maybe by editing your Gemfile or changing one of your application's configuration files, you can use the `reload` command to reload the entire environment:
 
 	> reload
-	
+
 And then finally, you can run the `exit` command to quit:
 
 	> exit
-	
+
 Reporting Issues and Contributing
 ------
 

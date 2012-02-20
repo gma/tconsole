@@ -132,68 +132,12 @@ module TConsole
       run_tests(config.file_sets[set], nil)
     end
 
-    # This code is from the rails test:recents command
-    def run_recent(test_pattern)
-      touched_since = Time.now - 600 # 10 minutes ago
-      files = recent_files(touched_since, "app/models/**/*.rb", "test/unit")
-      files.concat(recent_files(touched_since, "app/controllers/**/*.rb", "test/functional"))
-
-      message = "Running #{files.length} #{files.length == 1 ? "test file" : "test files"} based on changed files..."
-      run_tests(files, test_pattern, message)
-    end
-
     def run_failed
       file_names = last_result.failure_details.map { |detail| filenameify(detail[:class]) }
       files_to_rerun = []
 
       files_to_rerun << file_names.map {|file| (file.match(/controller/)) ? "test/functional/#{file}.rb" : "test/unit/#{file}.rb"}
       run_tests(files_to_rerun, nil, "Running last failed tests: #{files_to_rerun.join(", ")}")
-    end
-
-    def recent_files(touched_since, source_pattern, test_path)
-      Dir.glob(source_pattern).map do |path|
-        if File.mtime(path) > touched_since
-          tests = []
-          source_dir = File.dirname(path).split("/")
-          source_file = File.basename(path, '.rb')
-
-          # Support subdirs in app/models and app/controllers
-          modified_test_path = source_dir.length > 2 ? "#{test_path}/" << source_dir[1..source_dir.length].join('/') : test_path
-
-          # For modified files in app/ run the tests for it. ex. /test/functional/account_controller.rb
-          test = "#{modified_test_path}/#{source_file}_test.rb"
-          tests.push test if File.exist?(test)
-
-          # For modified files in app, run tests in subdirs too. ex. /test/functional/account/*_test.rb
-          test = "#{modified_test_path}/#{File.basename(path, '.rb').sub("_controller","")}"
-          File.glob("#{test}/*_test.rb").each { |f| tests.push f } if File.exist?(test)
-
-          return tests
-
-        end
-      end.flatten.compact
-    end
-
-    # Based on the code from rake test:uncommitted in Rails
-    def run_uncommitted(test_pattern)
-      if File.directory?(".svn")
-        changed_since_checkin = silence_stderr { `svn status` }.split.map { |path| path.chomp[7 .. -1] }
-      elsif File.directory?(".git")
-        changed_since_checkin = silence_stderr { `git ls-files --modified --others` }.split.map { |path| path.chomp }
-      else
-        puts "Not a Subversion or Git checkout."
-        return
-      end
-
-      models      = changed_since_checkin.select { |path| path =~ /app[\\\/]models[\\\/].*\.rb$/ }
-      controllers = changed_since_checkin.select { |path| path =~ /app[\\\/]controllers[\\\/].*\.rb$/ }
-
-      unit_tests       = models.map { |model| "test/unit/#{File.basename(model, '.rb')}_test.rb" }
-      functional_tests = controllers.map { |controller| "test/functional/#{File.basename(controller, '.rb')}_test.rb" }
-      files = (unit_tests + functional_tests).uniq.select { |file| File.exist?(file) }
-
-      message = "Running #{files.length} #{files.length == 1 ? "test file" : "test files"} based on uncommitted changes..."
-      run_tests(files, test_pattern, message)
     end
 
     def run_info

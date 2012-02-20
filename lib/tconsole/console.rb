@@ -1,6 +1,6 @@
 module TConsole
   class Console
-    KNOWN_COMMANDS = ["exit", "reload", "help", "recent", "uncommitted", "info", "!failed", "!timings", "set"]
+    KNOWN_COMMANDS = ["exit", "reload", "help", "info", "!failed", "!timings", "set"]
 
     def initialize(config)
       @config = config
@@ -48,10 +48,6 @@ module TConsole
           return true
         elsif args[0] == "help"
           print_help
-        elsif args[0] == "recent"
-          server.run_recent(args[1])
-        elsif args[0] == "uncommitted"
-          server.run_uncommitted(args[1])
         elsif args[0] == "!failed"
           server.run_failed
         elsif args[0] == "!timings"
@@ -75,14 +71,12 @@ module TConsole
       puts
       puts "Available commands:"
       puts
-      puts "recent [test_pattern]       # Run tests for recently changed files"
-      puts "uncommitted [test_pattern]  # Run tests for uncommitted changes"
-      puts "!failed                     # Runs the last set of failing tests"
-      puts "!timings [limit]            # Lists the timings for the last test run, sorted."
-      puts "[filename] [test_pattern]   # Run the tests contained in the given file"
       puts "reload                      # Reload your Rails environment"
       puts "set [variable] [value]      # Sets a runtime variable (see below for details)"
       puts "exit                        # Exit the console"
+      puts "!failed                     # Runs the last set of failing tests"
+      puts "!timings [limit]            # Lists the timings for the last test run, sorted."
+      puts "[filename] [test_pattern]   # Run the tests contained in the given file"
       puts
       puts "Running file sets"
       puts

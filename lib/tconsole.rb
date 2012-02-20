@@ -54,16 +54,18 @@ module TConsole
         # Set up our client connection to the server
         config.trace("Connecting to testing server.")
         DRb.start_service
-        server = DRbObject.new_with_uri("drbunix:/tmp/tconsole.#{server_pid}")
+        server = nil
 
         loaded = false
         until loaded || Time.now > wait_until
           begin
+            server = DRbObject.new_with_uri("drbunix:/tmp/tconsole.#{server_pid}")
+
             config.trace("Testing connection to test server.")
             loaded = server.connected?
           rescue
             # do nothing
-            config.trace("Not connected to server yet. Waiting.")
+            config.trace("Not connected to server yet. Retrying.")
             sleep(1)
           end
         end

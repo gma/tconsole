@@ -3,8 +3,21 @@
 require "drb/drb"
 
 class Server
+  def connected?
+    true
+  end
+
   def load_environment
-    puts "This is me pretending to load the environment."
+    ENV['RAILS_ENV'] ||= "test"
+
+    require './config/application'
+
+    ::Rails.application
+    ::Rails::Engine.class_eval do
+      def eager_load!
+        # turn off eager_loading
+      end
+    end
 
     true
   end
@@ -31,21 +44,20 @@ until loaded || Time.now > wait_until
   begin
     puts "Trying to load environment"
     server = DRbObject.new_with_uri("drbunix:#{socket}")
-    running = server.load_environment
-    loaded = true
-  rescue => e
-    puts e.message
-    puts e.backtrace.join("\n")
-    puts
-    puts
-
+    loaded = server.connected?
+  rescue
+    puts "Couldn't connect. Waiting."
     sleep(1)
   end
 end
 
 if !loaded
   puts "Wasn't able to connect"
-else
-  puts "Connected!"
-  server.stop
 end
+
+puts "Connected! Attempting to load environment"
+server.load_environment
+puts "Environment loaded!"
+
+# Clean it all up
+server.stop

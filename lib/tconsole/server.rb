@@ -145,7 +145,12 @@ module TConsole
     end
 
     def run_failed
-      run_tests(config.file_sets["all"], last_result.failures)
+      if last_result.failures.empty?
+        puts "No tests failed in your last run, or you haven't run any tests in this session yet."
+        puts
+      else
+        run_tests(config.file_sets["all"], last_result.failures)
+      end
     end
 
     def run_info

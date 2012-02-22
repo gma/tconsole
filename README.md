@@ -32,7 +32,7 @@ Installing tconsole
 
 Prereleases of tconsole come out pretty frequently. You can install the latest prerelease version with:
 
-	gem installt console --pre
+	gem install tconsole --pre
 
 How to use tconsole
 ------
@@ -45,7 +45,7 @@ In your shell of choice, cd into your Rails project's directory and then run `bu
 
 	>
 
-Now that you're in the console, let's test out the all command! Running all from the console runs all of your unit, functional, and integration tests:
+Now that you're in the console, let's test out the `all` command! Running `all` from the console runs all of your unit, functional, and integration tests:
 
 	> all
 	Running tests...

@@ -7,6 +7,14 @@ module TConsole
       self.last_result = TConsole::TestResult.new
     end
 
+    # Processes the message sent from the console
+    def handle(message)
+      action = message[:action]
+      if action == "load_environment"
+        load_environment
+      end
+    end
+
     # Basically just a noop that helps us figure out if we're connected or not
     def connected?
       true

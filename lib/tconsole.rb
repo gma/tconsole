@@ -47,8 +47,9 @@ module TConsole
           begin
             server = Server.new(config)
 
-            while message = server.read
+            while message = pipe_server.read
               config.trace("Server Received Message: #{message[:action]}")
+              pipe_server.write(server.handle(message))
             end
 
           rescue Interrupt

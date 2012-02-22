@@ -30,7 +30,7 @@ module TConsole
     end
 
     # Returns true if the app should keep running, false otherwise
-    def read_and_execute(server)
+    def read_and_execute(pipe_server)
       while line = Readline.readline("tconsole> ", false)
         line.strip!
         args = Shellwords.shellwords(line)
@@ -49,21 +49,26 @@ module TConsole
         elsif args[0] == "help"
           print_help
         elsif args[0] == "!failed"
-          server.run_failed
+          send_message_to_server({:action => "run_failed"}, pipe_server)
         elsif args[0] == "!timings"
-          server.show_performance(args[1])
+          send_message_to_server({:action => "show_performance", :limit => args[1]}, pipe_server)
         elsif args[0] == "info"
-          server.run_info
+          send_message_to_server({:action => "run_info"}, pipe_server)
         elsif args[0] == "set"
-          server.set(args[1], args[2])
+          send_message_to_server({:action => "set", :var => args[1], :value => args[2]}, pipe_server)
         elsif @config.file_sets.has_key?(args[0])
-          server.run_file_set(args[0])
+          send_message_to_server({:action => "run_file_set", :set => args[0]}, pipe_server)
         else
-          server.run_all_tests(args)
+          send_message_to_server({:action => "run_all_tests", :args => args}, pipe_server)
         end
       end
 
       true
+    end
+
+    def send_message_to_server(message, pipe_server)
+      pipe_server.write(message)
+      pipe_server.read
     end
 
     # Prints a list of available commands

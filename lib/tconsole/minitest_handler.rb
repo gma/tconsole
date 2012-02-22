@@ -113,10 +113,10 @@ module TConsole
         # If we've got match patterns, see if this matches them
         if !match_patterns.empty?
           match = match_patterns.find do |pattern|
-            pattern == suite.to_s || pattern == "#{suite.to_s}##{method.to_s}" || pattern == suite_id || pattern == id
+            pattern == suite.to_s || pattern == "#{suite.to_s}##{method.to_s}" || pattern == suite_id.to_s || pattern == id
           end
 
-          skip = true unless match
+          skip = true unless !match.nil?
         end
 
         if skip
@@ -165,16 +165,16 @@ module TConsole
       e = case e
           when MiniTest::Skip then
             @skips += 1
-            results.skips += 1
+            results.skip_count += 1
             return "S" unless @verbose
             "Skipped:\n#{meth}(#{klass}) [#{location e}]:\n#{e.message}\n"
           when MiniTest::Assertion then
             @failures += 1
-            results.failures += 1
+            results.failure_count += 1
             "Failure:\n#{meth}(#{klass}) [#{location e}]:\n#{e.message}\n"
           else
             @errors += 1
-            results.errors += 1
+            results.error_count += 1
             bt = MiniTest::filter_backtrace(e.backtrace).join "\n    "
             "Error:\n#{meth}(#{klass}):\n#{e.class}: #{e.message}\n    #{bt}\n"
           end

@@ -1,16 +1,16 @@
 module TConsole
   class TestResult
     # The number of failed tests in the last run
-    attr_accessor :failures
+    attr_accessor :failure_count
 
     # The number of errors that occurred in the last run
-    attr_accessor :errors
+    attr_accessor :error_count
 
     # The number of skipped tests
-    attr_accessor :skips
+    attr_accessor :skip_count
 
     # Details about the failures in the last run
-    attr_accessor :failure_details
+    attr_accessor :failures
 
     # The suites that we've run
     attr_accessor :suites
@@ -25,9 +25,9 @@ module TConsole
     attr_accessor :suite_counts
 
     def initialize
-      self.failures = 0
-      self.errors = 0
-      self.skips = 0
+      self.failure_count = 0
+      self.error_count = 0
+      self.skip_count = 0
       self.failures = []
       self.suites = {}
       self.timings = []

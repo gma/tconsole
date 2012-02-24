@@ -148,6 +148,7 @@ module TConsole
         end
       end
 
+      @loaded_configs ||= []
       @loaded_configs.each do |block|
         block.call(config)
       end

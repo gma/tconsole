@@ -51,7 +51,17 @@ module TConsole
 
             while message = pipe_server.read
               config.trace("Server Received Message: #{message[:action]}")
-              pipe_server.write(server.handle(message))
+              begin
+                result = server.handle(message)
+                pipe_server.write(result)
+              rescue => e
+                puts
+                puts "An error occured: #{e.message}"
+                config.trace("===========")
+                config.trace(e.backtrace.join("\n"))
+                config.trace("===========")
+                pipe_server.write(nil)
+              end
             end
 
           rescue Interrupt

@@ -63,6 +63,8 @@ module TConsole
 
           return false
         end
+
+        preload_test_ids
       end
 
       puts "Environment loaded in #{time}s."
@@ -76,16 +78,40 @@ module TConsole
       config.cached_elements.keys.grep(/^#{Regexp.escape(text)}/)
     end
 
+    # Runs the given code in a block and returns the result of the code in the block.
+    # The block's result needs to be marshallable. Otherwise, nil is returned.
+    def run_in_fork(&block)
+     # Pipe for communicating with child so we can get its results back
+      read, write = IO.pipe
+
+      pid = fork do
+        read.close
+
+        result = block.call
+
+        write.puts([Marshal.dump(result)].pack("m0"))
+      end
+
+      write.close
+      response = read.read
+      read.close
+      Process.wait(pid)
+
+      begin
+        config.trace("Reading result from fork.")
+        Marshal.load(response.unpack("m")[0])
+      rescue => e
+        config.trace("Problem reading result from fork. Returning nil.")
+        config.trace(e.message)
+        nil
+      end
+    end
+
     # Loads the files that match globs and then executes tests against them. Limit tests
     # with class names, method names, and test ids using match_patterns.
     def run_tests(globs, match_patterns, message = "Running tests...")
       time = Benchmark.realtime do
-        # Pipe for communicating with child so we can get its results back
-        read, write = IO.pipe
-
-        fork do
-          read.close
-
+        self.last_result = run_in_fork do
           puts message
           puts
 
@@ -103,6 +129,7 @@ module TConsole
           config.before_test_run!
           config.trace("Completed before_test_run callback")
 
+          result = nil
           if defined?(::MiniTest)
             config.trace("Detected minitest.")
             require File.join(File.dirname(__FILE__), "minitest_handler")
@@ -110,48 +137,45 @@ module TConsole
             config.trace("Running tests.")
             result = MiniTestHandler.run(match_patterns, config)
             config.trace("Finished running tests.")
-
-            config.trace("Writing test results back to server.")
-            write.puts([Marshal.dump(result)].pack("m"))
-            config.trace("Finished writing test results to server.")
-
           elsif defined?(::Test::Unit)
             puts "Sorry, but tconsole doesn't support Test::Unit yet"
-            return
           elsif defined?(::RSpec)
             puts "Sorry, but tconsole doesn't support RSpec yet"
-            return
           end
+
+          result
         end
 
-        write.close
-        response = read.read
-        begin
-          config.trace("Reading test results from console.")
-          self.last_result = Marshal.load(response.unpack("m")[0])
-          config.cache_test_ids(self.last_result)
-          config.trace("Finished reading test results from console.")
-        rescue => e
-          config.trace("Exception: #{e.message}")
-          config.trace("==== Backtrace ====")
-          config.trace(e.backtrace.join("\n"))
-          config.trace("==== End Backtrace ====")
-
-          puts "ERROR: Unable to process test results."
-          puts
-
+        if self.last_result == nil
           # Just in case anything crazy goes down with marshalling
           self.last_result = TConsole::TestResult.new
         end
 
-        read.close
+        config.cache_test_ids(self.last_result)
 
-        Process.waitall
+        true
       end
 
       puts
       puts "Test time (including load): #{time}s"
       puts
+    end
+
+    # Preloads our autocomplete cache
+    def preload_test_ids
+      result = run_in_fork do
+        paths = []
+        config.file_sets["all"].each do |glob|
+          paths.concat(Dir.glob(glob))
+        end
+
+        paths.each { |path| require File.expand_path(path) }
+
+        require File.join(File.dirname(__FILE__), "minitest_handler")
+        MiniTestHandler.preload_elements
+      end
+
+      config.cache_test_ids(result) unless result.nil?
     end
 
     # Runs all tests against the match patterns given

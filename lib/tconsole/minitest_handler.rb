@@ -18,6 +18,23 @@ module TConsole
       runner.results
     end
 
+    # Preloads our element cache for autocompletion. Assumes tests are already loaded
+    def self.preload_elements
+      patch_minitest
+
+      results = TConsole::TestResult.new
+
+      suites = ::MiniTest::Unit::TestCase.test_suites
+      suites.each do |suite|
+        suite.test_methods.map do |method|
+          id = results.add_element(suite, method)
+        end
+      end
+
+      results
+    end
+
+
     # We're basically breaking MiniTest autorun here, since we want to manually run our
     # tests and Rails relies on autorun
     #

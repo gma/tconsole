@@ -16,14 +16,15 @@ module TConsole
 
       # Proc for helping us figure out autocompletes
       Readline.completion_proc = Proc.new do |str|
-        known_commands = KNOWN_COMMANDS.concat(@config.file_sets.keys).grep(/^#{Regexp.escape(str)}/)
+        known_commands = KNOWN_COMMANDS.grep(/^#{Regexp.escape(str)}/)
+        known_commands.concat(@config.file_sets.keys.grep(/^#{Regexp.escape(str)}/))
 
         known_elements = []
         unless pipe_server.nil?
           known_elements = send_message_to_server({:action => "autocomplete", :text => str})
         end
 
-        known_commands.concat(known_elements).sort
+        known_commands.concat(known_elements)
       end
     end
 

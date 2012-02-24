@@ -24,16 +24,9 @@ module TConsole
         run_file_set(message[:set])
       elsif action == "run_all_tests"
         run_all_tests(message[:args])
+      elsif action == "exit"
+        exit(0)
       end
-    end
-
-    # Basically just a noop that helps us figure out if we're connected or not
-    def connected?
-      true
-    end
-
-    def stop
-      DRb.stop_service
     end
 
     def load_environment

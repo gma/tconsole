@@ -49,13 +49,15 @@ class PipeServer
 
   # Blocks until a message is received, and then runs block on it with
   # the message as a parameter.
-  #
-  # Should only be run on the callee side of the pipe
-  def process_messages(&block)
-    while message = read
-      response = block.call(message)
-      write(response)
-    end
+  def ceive(&block)
+    message = read
+
+    return nil if message.nil?
+
+    response = block.call(message)
+    write(response)
+
+    response
   end
 
 private
@@ -81,7 +83,8 @@ server = PipeServer.new
 server_pid = fork do
   server.callee!
 
-  server.process_messages do |message|
+
+  while message = server.read
     puts "SERVER READ message: #{message}"
 
     if message == "exit"

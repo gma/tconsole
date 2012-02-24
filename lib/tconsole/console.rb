@@ -43,8 +43,10 @@ module TConsole
         if line == ""
           # do nothing
         elsif args[0] == "exit"
+          send_message_to_server({:action => "exit"}, pipe_server)
           return false
         elsif args[0] == "reload"
+          send_message_to_server({:action => "exit"}, pipe_server)
           return true
         elsif args[0] == "help"
           print_help

@@ -31,7 +31,7 @@ module TConsole
     # Writes a message to the appropriate pipe. The message can be
     # anything that will Marshal cleanly
     def write(message)
-      encoded_message = [Marshal.dump(message)].pack("m")
+      encoded_message = [Marshal.dump(message)].pack("m0")
       @me[1].puts(encoded_message)
     end
 

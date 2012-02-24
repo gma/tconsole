@@ -72,7 +72,6 @@ module TConsole
 
         running = console.read_and_execute(pipe_server)
 
-        server.stop
         Process.waitall
       end
 

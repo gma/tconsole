@@ -2,6 +2,7 @@ require "tconsole/version"
 require "tconsole/config"
 require "tconsole/console"
 require "tconsole/server"
+require "tconsole/pipe_server"
 require "tconsole/test_result"
 require "tconsole/util"
 
@@ -37,63 +38,40 @@ module TConsole
       while running
         # ignore ctrl-c during load, since things can get kind of messy if we don't
 
+        pipe_server = PipeServer.new
+
         config.trace("Forking test server.")
         server_pid = fork do
+          pipe_server.callee!
+
           begin
             server = Server.new(config)
 
-            drb_server = DRb.start_service("drbunix:/tmp/tconsole.#{Process.pid}", server)
-            DRb.thread.join
+            while message = pipe_server.read
+              config.trace("Server Received Message: #{message[:action]}")
+              pipe_server.write(server.handle(message))
+            end
+
           rescue Interrupt
             # do nothing here since the outer process will shut things down for us
           end
         end
 
+        pipe_server.caller!
+
         wait_until = Time.now + 10
 
-        # Set up our client connection to the server
-        config.trace("Connecting to testing server.")
-        DRb.start_service
-        server = nil
+        config.trace("Attempting to load environment.")
+        pipe_server.write({:action => "load_environment"})
 
-        loaded = false
-        until loaded || Time.now > wait_until
-          begin
-            server = DRbObject.new_with_uri("drbunix:/tmp/tconsole.#{server_pid}")
-
-            config.trace("Testing connection to test server.")
-            loaded = server.connected?
-          rescue
-            # do nothing
-            config.trace("Not connected to server yet. Retrying.")
-            sleep(1)
-          end
-        end
-
-        unless loaded
-          puts
-          puts "Couldn't connect to the test environment. Exiting."
-          exit(1)
-        end
-
-        begin
-          config.trace("Attempting to load environment.")
-          running = server.load_environment
-        rescue => e
-          config.trace("Could not load environment: #{e.message}")
-          config.trace("==== Backtrace ====")
-          config.trace(e.backtrace.join("\n"))
-          config.trace("==== End Backtrace ====")
-
+        unless pipe_server.read
           puts "Couldn't load the test environment. Exiting."
           exit(1)
         end
-
         config.trace("Environment loaded successfully.")
 
-        running = console.read_and_execute(server) if running
+        running = console.read_and_execute(pipe_server)
 
-        server.stop
         Process.waitall
       end
 

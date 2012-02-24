@@ -28,6 +28,8 @@ module TConsole
       puts "Welcome to tconsole (v#{TConsole::VERSION}). Type 'help' for help or 'exit' to quit."
 
       # set up the config
+      Config.load_config(File.join(Dir.home, ".tconsole"))
+      Config.load_config(File.join(Dir.pwd, ".tconsole"))
       config = Config.configure
       config.trace_execution = true if argv.include?("--trace")
 

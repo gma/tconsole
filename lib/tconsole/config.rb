@@ -91,10 +91,29 @@ module TConsole
       self.cached_elements = result.elements
     end
 
+    # Loads up a config file
+    def self.load_config(path)
+      if File.exist?(path)
+        load path
+      end
+    end
+
+    # Saves a configuration block that we can apply to the configuration once it's
+    # loaded
+    def self.run(&block)
+      @loaded_configs ||= []
+      @loaded_configs << block
+    end
+
+    def self.clear_loaded_configs
+      @loaded_configs = nil
+    end
+
     # Returns an appropriate tconsole config based on the environment
     def self.configure
+      config = Config.new
+
       if is_rails?
-        config = Config.new
         config.preload_paths = ["./config/application"]
         config.include_paths = ["./test"]
         config.file_sets = {
@@ -127,11 +146,13 @@ module TConsole
             ::ActiveRecord::Base.establish_connection
           end
         end
-
-        config
-      else
-        Config.new
       end
+
+      @loaded_configs.each do |block|
+        block.call(config)
+      end
+
+      config
     end
 
     def self.is_rails?

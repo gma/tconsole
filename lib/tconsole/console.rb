@@ -2,6 +2,8 @@ module TConsole
   class Console
     KNOWN_COMMANDS = ["exit", "reload", "help", "info", "!failed", "!timings", "set"]
 
+    attr_accessor :pipe_server
+
     def initialize(config)
       @config = config
       read_history
@@ -14,23 +16,24 @@ module TConsole
 
       # Proc for helping us figure out autocompletes
       Readline.completion_proc = Proc.new do |str|
-        known_commands = KNOWN_COMMANDS.grep(/^#{Regexp.escape(str)}/)
+        known_commands = KNOWN_COMMANDS.concat(@config.file_sets.keys).grep(/^#{Regexp.escape(str)}/)
 
-        files = Dir[str+'*'].grep(/^#{Regexp.escape(str)}/)
-        formatted_files = files.collect do |filename|
-          if File.directory?(filename)
-            filename + File::SEPARATOR
-          else
-            filename
-          end
+        known_elements = []
+        unless pipe_server.nil?
+          known_elements = send_message_to_server({:action => "autocomplete", :text => str})
         end
 
-        known_commands.concat(formatted_files).concat(@config.file_sets.keys)
+        known_commands.concat(known_elements).sort
       end
     end
 
     # Returns true if the app should keep running, false otherwise
-    def read_and_execute(pipe_server)
+    def read_and_execute
+      if pipe_server.nil?
+        puts "No connection to test environment. Exiting."
+        return false
+      end
+
       while line = Readline.readline("tconsole> ", false)
         line.strip!
         args = Shellwords.shellwords(line)
@@ -43,32 +46,33 @@ module TConsole
         if line == ""
           # do nothing
         elsif args[0] == "exit"
-          send_message_to_server({:action => "exit"}, pipe_server)
+          send_message_to_server({:action => "exit"})
+          self.pipe_server = nil
           return false
         elsif args[0] == "reload"
-          send_message_to_server({:action => "exit"}, pipe_server)
+          send_message_to_server({:action => "exit"})
           return true
         elsif args[0] == "help"
           print_help
         elsif args[0] == "!failed"
-          send_message_to_server({:action => "run_failed"}, pipe_server)
+          send_message_to_server({:action => "run_failed"})
         elsif args[0] == "!timings"
-          send_message_to_server({:action => "show_performance", :limit => args[1]}, pipe_server)
+          send_message_to_server({:action => "show_performance", :limit => args[1]})
         elsif args[0] == "info"
           send_message_to_server({:action => "run_info"}, pipe_server)
         elsif args[0] == "set"
-          send_message_to_server({:action => "set", :var => args[1], :value => args[2]}, pipe_server)
+          send_message_to_server({:action => "set", :var => args[1], :value => args[2]})
         elsif @config.file_sets.has_key?(args[0])
-          send_message_to_server({:action => "run_file_set", :set => args[0]}, pipe_server)
+          send_message_to_server({:action => "run_file_set", :set => args[0]})
         else
-          send_message_to_server({:action => "run_all_tests", :args => args}, pipe_server)
+          send_message_to_server({:action => "run_all_tests", :args => args})
         end
       end
 
       true
     end
 
-    def send_message_to_server(message, pipe_server)
+    def send_message_to_server(message)
       pipe_server.write(message)
       pipe_server.read
     end

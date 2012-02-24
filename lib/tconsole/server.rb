@@ -24,6 +24,8 @@ module TConsole
         run_file_set(message[:set])
       elsif action == "run_all_tests"
         run_all_tests(message[:args])
+      elsif action == "autocomplete"
+        autocomplete(message[:text])
       elsif action == "exit"
         exit(0)
       end
@@ -67,6 +69,11 @@ module TConsole
       puts
 
       result
+    end
+
+    # Returns an array of possible completions based on the available element data
+    def autocomplete(text)
+      config.cached_elements.keys.grep(/^#{Regexp.escape(text)}/)
     end
 
     # Loads the files that match globs and then executes tests against them. Limit tests

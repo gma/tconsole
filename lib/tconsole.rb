@@ -70,7 +70,9 @@ module TConsole
         end
         config.trace("Environment loaded successfully.")
 
-        running = console.read_and_execute(pipe_server)
+        console.pipe_server = pipe_server
+        running = console.read_and_execute
+        console.pipe_server = nil
 
         Process.waitall
       end

@@ -164,7 +164,7 @@ module TConsole
 
           output = "#{result} #{method}"
 
-          print COLOR_MAP[result], " #{output}", ::Term::ANSIColor.reset, " #{time}s ",
+          print COLOR_MAP[result], " #{output}", ::Term::ANSIColor.reset, " #{"%0.6f" % time }s ",
             ::Term::ANSIColor.magenta, "#{id}", ::Term::ANSIColor.reset, "\n"
 
           if @failed_fast

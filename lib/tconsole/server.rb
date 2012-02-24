@@ -67,7 +67,7 @@ module TConsole
         preload_test_ids
       end
 
-      puts "Environment loaded in #{time}s."
+      puts "Environment loaded in #{"%0.6f" % time}s."
       puts
 
       result
@@ -157,7 +157,7 @@ module TConsole
       end
 
       puts
-      puts "Test time (including load): #{time}s"
+      puts "Test time (including load): #{"%0.6f" % time}s"
       puts
     end
 
@@ -219,7 +219,7 @@ module TConsole
         puts "No timing data available. Be sure you've run some tests."
       else
         sorted_timings.reverse[0, limit].each do |timing|
-          puts "#{timing[:time]}s #{timing[:suite]}##{timing[:method]}"
+          puts "#{"%0.6f" % timing[:time]}s #{timing[:suite]}##{timing[:method]}"
         end
       end
 

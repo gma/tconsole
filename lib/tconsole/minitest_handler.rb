@@ -9,7 +9,7 @@ module TConsole
       end
 
       # Run it
-      runner = MiniTest::Unit.runner
+      runner = ::MiniTest::Unit.runner
       runner.run
 
       # Make sure that minitest doesn't run automatically when the process exits
@@ -73,6 +73,9 @@ module TConsole
       results.elements = config.cached_elements
 
       super()
+
+      # We do this since plugins like turn may have tweaked it
+      @@out = $stdout
     end
 
     def _run_anything(type)

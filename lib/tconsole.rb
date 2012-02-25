@@ -33,6 +33,13 @@ module TConsole
       config = Config.configure
       config.trace_execution = true if argv.include?("--trace")
 
+      config_errors = config.validation_errors
+      if config_errors.length > 0
+        puts
+        puts config_errors.first
+        exit(1)
+      end
+
       # Set up our console input handling and history
       console = Console.new(config)
 

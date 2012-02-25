@@ -16,6 +16,22 @@ module TConsole
         assert_equal false, @config.fail_fast
         assert_equal({ "all" => ["./test/**/*_test.rb"] }, @config.file_sets)
       end
+
+      it "should have a validation error if the configured test directory doesn't exist" do
+        @config.test_dir = "./monkey_business"
+
+        errors = @config.validation_errors
+        refute_nil errors
+        assert_equal "Couldn't find test directory `./monkey_business`. Exiting.", errors[0]
+      end
+
+      it "should have a validation error if the configuration doesn't include an all file set" do
+        @config.file_sets = {}
+
+        errors = @config.validation_errors
+        refute_nil errors
+        assert_equal "No `all` file set is defined in your configuration. Exiting.", errors[0]
+      end
     end
 
     the "Config class" do

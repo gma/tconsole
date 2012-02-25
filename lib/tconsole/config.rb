@@ -91,6 +91,21 @@ module TConsole
       self.cached_elements = result.elements
     end
 
+    # Returns true if this config is valid or false otherwise
+    def validation_errors
+      errors = []
+
+      unless Dir.exists?(test_dir)
+        errors << "Couldn't find test directory `#{test_dir}`. Exiting."
+      end
+
+      unless file_sets.is_a?(Hash) && !file_sets["all"].nil?
+        errors << "No `all` file set is defined in your configuration. Exiting."
+      end
+
+      errors
+    end
+
     # Loads up a config file
     def self.load_config(path)
       if File.exist?(path)

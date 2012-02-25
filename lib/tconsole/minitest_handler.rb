@@ -109,7 +109,20 @@ module TConsole
     end
 
     def status(io = self.output)
-      format = "%d tests, %d assertions, %d failures, %d errors, %d skips"
+      format = "%d tests, %d assertions, "
+
+      format << COLOR_MAP["F"] if failures > 0
+      format << "%d failures, "
+      format << ::Term::ANSIColor.reset if failures > 0
+
+      format << COLOR_MAP["E"] if errors > 0
+      format << "%d errors, "
+      format << ::Term::ANSIColor.reset if errors > 0
+
+      format << COLOR_MAP["S"] if skips > 0
+      format << "%d skips"
+      format << ::Term::ANSIColor.reset if skips > 0
+
       io.puts format % [test_count, assertion_count, failures, errors, skips]
     end
 

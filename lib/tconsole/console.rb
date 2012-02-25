@@ -47,34 +47,34 @@ module TConsole
         if line == ""
           # do nothing
         elsif args[0] == "exit"
-          send_message_to_server({:action => "exit"})
+          send_message(:stop)
           self.pipe_server = nil
           return false
         elsif args[0] == "reload"
-          send_message_to_server({:action => "exit"})
+          send_message(:stop)
           return true
         elsif args[0] == "help"
           print_help
         elsif args[0] == "!failed"
-          send_message_to_server({:action => "run_failed"})
+          send_message(:run_failed)
         elsif args[0] == "!timings"
-          send_message_to_server({:action => "show_performance", :limit => args[1]})
+          send_message(:show_performance, args[1])
         elsif args[0] == "info"
-          send_message_to_server({:action => "run_info"}, pipe_server)
+          send_message(:run_info)
         elsif args[0] == "set"
-          send_message_to_server({:action => "set", :var => args[1], :value => args[2]})
+          send_message(:set, args[1], args[2])
         elsif @config.file_sets.has_key?(args[0])
-          send_message_to_server({:action => "run_file_set", :set => args[0]})
+          send_message(:run_file_set, args[0])
         else
-          send_message_to_server({:action => "run_all_tests", :args => args})
+          send_message(:run_all_tests, args)
         end
       end
 
       true
     end
 
-    def send_message_to_server(message)
-      pipe_server.write(message)
+    def send_message(message, *args)
+      pipe_server.write({:action => message.to_sym, :args => args})
       pipe_server.read
     end
 

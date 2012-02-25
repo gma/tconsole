@@ -10,32 +10,25 @@ module TConsole
     # Processes the message sent from the console
     def handle(message)
       action = message[:action]
-      args = message[:args]
-
-      send(action, *args)
-      # if action == "load_environment"
-      #   load_environment
-      # elsif action == "run_failed"
-      #   run_failed
-      # elsif action == "show_performance"
-      #   show_performance(message[:limit])
-      # elsif action == "run_info"
-      #   run_info
-      # elsif action == "set"
-      #   set(message[:var], message[:value])
-      # elsif action == "run_file_set"
-      #   run_file_set(message[:set])
-      # elsif action == "run_all_tests"
-      #   run_all_tests(message[:args])
-      # elsif action == "autocomplete"
-      #   autocomplete(message[:text])
-      # elsif action == "exit"
-      #   exit(0)
-      # end
-    end
-
-    def stop
-      Kernel.exit(0)
+      if action == "load_environment"
+        load_environment
+      elsif action == "run_failed"
+        run_failed
+      elsif action == "show_performance"
+        show_performance(message[:limit])
+      elsif action == "run_info"
+        run_info
+      elsif action == "set"
+        set(message[:var], message[:value])
+      elsif action == "run_file_set"
+        run_file_set(message[:set])
+      elsif action == "run_all_tests"
+        run_all_tests(message[:args])
+      elsif action == "autocomplete"
+        autocomplete(message[:text])
+      elsif action == "exit"
+        exit(0)
+      end
     end
 
     def load_environment
@@ -237,7 +230,7 @@ module TConsole
       if key == "fast"
         if !value.nil?
           value.downcase!
-          if ["on", "true", "yes"].include?(value)
+          if ["on", "true", "yes"].include(value)
             config.fail_fast = true
           else
             config.fail_fast = false
@@ -253,6 +246,35 @@ module TConsole
         puts ::Term::ANSIColor.yellow + "I don't know how to set `#{key}`." + ::Term::ANSIColor.reset + " Usage: set {key} {value}"
         puts
       end
+    end
+
+    def filenameify(klass_name)
+      result = ""
+      first = true
+      klass_name.chars do |char|
+        new = char.downcase!
+        if new.nil?
+          result << char
+        elsif first
+          result << new
+        else
+          result << "_#{new}"
+        end
+
+        first = false
+      end
+
+      result
+    end
+
+    # Totally yanked from the Rails test tasks
+    def silence_stderr
+      old_stderr = STDERR.dup
+      STDERR.reopen(RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ ? 'NUL:' : '/dev/null')
+      STDERR.sync = true
+      yield
+    ensure
+      STDERR.reopen(old_stderr)
     end
   end
 end

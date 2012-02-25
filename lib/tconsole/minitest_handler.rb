@@ -197,19 +197,19 @@ module TConsole
             @skips += 1
             results.skip_count += 1
             return "S" unless @verbose
-            "Skipped:\n#{meth}(#{klass}) [#{location e}]:\n#{e.message}\n"
+            ["S", COLOR_MAP["S"] + "Skipped:\n#{meth}(#{klass})" + ::Term::ANSIColor.reset + " [#{location e}]:\n#{e.message}\n"]
           when MiniTest::Assertion then
             @failures += 1
             results.failure_count += 1
-            "Failure:\n#{meth}(#{klass}) [#{location e}]:\n#{e.message}\n"
+            ["F", COLOR_MAP["F"] + "Failure:\n#{meth}(#{klass})" + ::Term::ANSIColor.reset + " [#{location e}]:\n#{e.message}\n"]
           else
             @errors += 1
             results.error_count += 1
             bt = MiniTest::filter_backtrace(e.backtrace).join "\n    "
-            "Error:\n#{meth}(#{klass}):\n#{e.class}: #{e.message}\n    #{bt}\n"
+            ["E", COLOR_MAP["E"] + "Error:\n#{meth}(#{klass}):\n" + ::Term::ANSIColor.reset + "#{e.class}: #{e.message}\n    #{bt}\n"]
           end
-      @report << e
-      e[0, 1]
+      @report << e[1]
+      e[0]
     end
   end
 end

@@ -228,17 +228,22 @@ module TConsole
 
     def set(key, value)
       if key == "fast"
-        value.downcase!
-        if value == "on" || value == "true" || value == "yes"
-          config.fail_fast = true
-        else
-          config.fail_fast = false
-        end
+        if value.is_a?(String)
+          value.downcase!
+          if value == "on" || value == "true" || value == "yes"
+            config.fail_fast = true
+          else
+            config.fail_fast = false
+          end
 
-        puts "Fail Fast is now #{config.fail_fast ? "on" : "off"}"
-        puts
+          puts ::Term::ANSIColor.green + "Fail Fast is now #{config.fail_fast ? "on" : "off"}" + ::Term::ANSIColor.reset
+          puts
+        else
+          puts ::Term::ANSIColor.green + "Fail fast is currently #{config.fail_fast ? "on" : "off"}" + ::Term::ANSIColor.reset
+          puts
+        end
       else
-        puts "#{key} isn't an available runtime setting."
+        puts ::Term::ANSIColor.yellow + "I don't know how to set `#{key}`." + ::Term::ANSIColor.reset + " Usage: set {key} {value}"
         puts
       end
     end

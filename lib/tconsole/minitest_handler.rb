@@ -60,7 +60,7 @@ module TConsole
       "P" => ::Term::ANSIColor.green
     }
 
-    attr_accessor :match_patterns, :config, :results
+    attr_accessor :match_patterns, :config, :results, :passes
 
     def initialize(match_patterns, config)
       self.match_patterns = match_patterns
@@ -68,6 +68,8 @@ module TConsole
 
       self.config = config
       self.results = TConsole::TestResult.new
+
+      self.passes = 0
 
       results.suite_counts = config.cached_suite_counts
       results.elements = config.cached_elements
@@ -114,6 +116,10 @@ module TConsole
     def status(io = self.output)
       format = "%d tests, %d assertions, "
 
+      format << COLOR_MAP["P"] if passes > 0
+      format << "%d passes, "
+      format << ::Term::ANSIColor.reset if passes > 0
+
       format << COLOR_MAP["F"] if failures > 0
       format << "%d failures, "
       format << ::Term::ANSIColor.reset if failures > 0
@@ -126,7 +132,7 @@ module TConsole
       format << "%d skips"
       format << ::Term::ANSIColor.reset if skips > 0
 
-      io.puts format % [test_count, assertion_count, failures, errors, skips]
+      io.puts format % [test_count, assertion_count, passes, failures, errors, skips]
     end
 
     def _run_suite(suite, type)
@@ -170,7 +176,10 @@ module TConsole
           time = Time.now - @start_time
           results.add_timing(suite, method, time)
 
-          result = "P" if result == "."
+          if result == "."
+            result = "P"
+            self.passes += 1
+          end
 
           results.failures << id unless result == "P"
 

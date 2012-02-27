@@ -21,7 +21,7 @@ module TConsole
 
         known_elements = []
         unless pipe_server.nil?
-          known_elements = send_message_to_server({:action => "autocomplete", :text => str})
+          known_elements = send_message(:autocomplete, str)
         end
 
         known_commands.concat(known_elements)

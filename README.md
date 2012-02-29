@@ -1,4 +1,4 @@
-tconsole
+TConsole
 ======
 
 TConsole is a testing console for Rails. It allows you to issue commands
@@ -6,7 +6,13 @@ concerning what tests to run, and see their test output. It's also got a
 helpful reload command for when your Rails environment needs to be
 restarted.
 
-TConsole has only been tested with Rails 3 with Ruby 1.9.3 and 1.8.7 with MiniTest as the testing framework (the Rails default) on a Mac, but in theory it should work with pretty much any Unixy operating system (tconsole uses fork a good bit).
+TConsole should work in pretty much any Unix environment and will work with apps running Ruby 1.8.7 and Ruby 1.9.3. It can be run on pretty much any test suite that uses MiniTest, including Rails test suites.
+
+See it in Action
+------
+![Meet TConsole](https://secure-b.vimeocdn.com/ts/258/676/258676311_960.jpg)
+
+There's a quick screencast on Vimeo about TConsole's basic features: [Meet TConsole!](https://vimeo.com/37641415)
 
 Why use TConsole?
 ------

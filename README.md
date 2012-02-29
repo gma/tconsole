@@ -1,18 +1,24 @@
-tconsole
+TConsole
 ======
 
-tconsole is a testing console for Rails. It allows you to issue commands
+TConsole is a testing console for Rails. It allows you to issue commands
 concerning what tests to run, and see their test output. It's also got a
 helpful reload command for when your Rails environment needs to be
 restarted.
 
-tconsole has only been tested with Rails 3 with Ruby 1.9.3 and 1.8.7 with MiniTest as the testing framework (the Rails default) on a Mac, but in theory it should work with pretty much any Unixy operating system (tconsole uses fork a good bit).
+TConsole should work in pretty much any Unix environment and will work with apps running Ruby 1.8.7 and Ruby 1.9.3. It can be run on pretty much any test suite that uses MiniTest, including Rails test suites.
 
-Why use tconsole?
+See it in Action
+------
+There's a quick screencast on Vimeo about TConsole's basic features: [Meet TConsole!](https://vimeo.com/37641415)
+
+Why use TConsole?
 ------
 
-* A large amount of time is wasted loading the Rails environment each time you run the Rails testing rake tasks. tconsole loads the environment when you start the console and whenever you reload the environment, but doesn't have to reload the environment for each test execution.
-* The Rails rake task syntax `bundle exec rake test:units TEST=test/unit/user_test.rb` can be pretty verbose when you're running specific tests. Yeah, there are tricks you can use to shorten things up, but still, that's crazy long. tconsole lets you just type `test/unit/user_test.rb` to get that specific test file to run. I'm working on fuzzy matching, too, so that you can just type 'user' and get the user test to run.
+* A large amount of time is wasted loading the Rails environment each time you run the Rails testing rake tasks. TConsole loads the environment when you start the console and whenever you reload the environment, but doesn't have to reload the environment for each test execution.
+* The Rails rake task syntax `bundle exec rake test:units TEST=test/unit/user_test.rb` can be pretty verbose when you're running specific tests. Yeah, there are tricks you can use to shorten things up, but still, that's crazy long. tconsole lets you just type `test/unit/user_test.rb` to get that specific test file to run. With TConsole  you can just type `UserTest` and the test runs!
+* TConsole makes it dead simple to review how long your tests are taking to run and pinpoint your slowest running tests.
+* Re-running failed tests is as easy as typing `!failed` with TConsole.
 
 What about Spork?
 ------
@@ -20,21 +26,21 @@ What about Spork?
 
 What about rspec?
 ------
-I'm not sure if tconsole will ever support rspec or not. I love the idea
-of adding support for rspec, but I also don't use rspec all that often,
-so it likely wouldn't be very well tested. If enough people fuss at me,
-or if someone were willing to add and maintain rspec support I'd definitely be
-willing to merge it in, though.
+We've decided to focus on integrating with MiniTest as tightly as possible, rather than worrying about rspec support.
 
-Installing tconsole
+Installing TConsole
 ------
-	gem install tconsole
+    gem install tconsole
 
-Prereleases of tconsole come out pretty frequently. You can install the latest prerelease version with:
+Prereleases of TConsole come out pretty frequently. You can install the latest prerelease version with:
 
-	gem install tconsole --pre
+    gem install tconsole --pre
+    
+If you're using bundler, you probably want to simply add TConsole to your Gemfile:
 
-How to use tconsole
+    gem "tconsole"
+
+How to use TConsole
 ------
 In your shell of choice, cd into your Rails project's directory and then run `bundle exec tconsole` to fire up the console. You should see something like this:
 
@@ -66,23 +72,25 @@ Now that you're in the console, let's test out the `all` command! Running `all` 
 
 If you want to focus in on a particular subset of your tests, like units, functionals, or integration, just enter that keyword:
 
-	> units
+    > units
 
-	> functionals
+    > functionals
 
-	> integration
+    > integration
 
 You can also specify to run all tests in a specific class:
 
-	> UserTest
+    > UserTest
 
-You can go one bit deeper and just run a particular test in that file as
+You can dig a bit deeper and just run a particular test in that file as
 well:
 
-	> UserTest#test_that_user_is_healthy
+    > UserTest#test_that_user_is_healthy
 
 You can list more than just one class or class and method to run, and
-tconsole will run them all.
+TConsole will run them all.
+
+    > UserTest InvoiceTest SubscriptionTest#test_that_renew_renews_the_subscription
 
 There are a few special ! commands that use data from past test runs. The `!failed` command will rerun the set of tests that failed during the last run:
 
@@ -107,7 +115,7 @@ improve slow tests:
 	0.001128s PostTest#test_post's_state_should_change_when_published
 	0.001056s PostTest#test_returning_only_published_posts
 	0.000923s PostTest#test_post_should_have_respond_to_published_appropriately
-	0.00077s PostTest#test_post_should_have_a_body
+	0.000770s PostTest#test_post_should_have_a_body
 
 You can turn on the Fail Fast feature to cause TConsole to stop running
 tests as soon as the first test fails. To enable fail fast simply enter:
@@ -185,7 +193,7 @@ Reporting Issues and Contributing
 
 Feel free to report issues in the issue tracker at https://github.com/commondream/tconsole/issues. Be sure to include the versions of Ruby, Rails, and your operating system. For bonus points, fork the project and send me a pull request with the fix for the issue you're seeing.
 
-tconsole is just a quick idea I had that I wanted to spike out, so there aren't any tests yet. Hopefully that will change in the near future!
+*How embarrassing?!?! A testing tool with no tests?* At first TConsole was just a bit of experimental code, so test coverage is light. I am working on improving that, though.
 
 License
 -----

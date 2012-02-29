@@ -10,8 +10,6 @@ TConsole should work in pretty much any Unix environment and will work with apps
 
 See it in Action
 ------
-![Meet TConsole](https://secure-b.vimeocdn.com/ts/258/676/258676311_960.jpg)
-
 There's a quick screencast on Vimeo about TConsole's basic features: [Meet TConsole!](https://vimeo.com/37641415)
 
 Why use TConsole?

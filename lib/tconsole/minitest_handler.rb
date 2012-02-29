@@ -181,7 +181,7 @@ module TConsole
             self.passes += 1
           end
 
-          results.failures << id unless result == "P"
+          results.failures << id unless result == "P" || result == "S"
 
           if config.fail_fast && result != "P" && result != "S"
             @failed_fast = true

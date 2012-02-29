@@ -109,6 +109,15 @@ improve slow tests:
 	0.000923s PostTest#test_post_should_have_respond_to_published_appropriately
 	0.00077s PostTest#test_post_should_have_a_body
 
+You can turn on the Fail Fast feature to cause TConsole to stop running
+tests as soon as the first test fails. To enable fail fast simply enter:
+
+  > set fast on
+
+In the console. You can disable Fail Fast again with:
+
+  > set fast off
+
 If you update your environment, maybe by editing your Gemfile or changing one of your application's configuration files, you can use the `reload` command to reload the entire environment:
 
 	> reload
@@ -116,6 +125,60 @@ If you update your environment, maybe by editing your Gemfile or changing one of
 And then finally, you can run the `exit` command to quit:
 
 	> exit
+
+Configuration Files
+------
+
+TConsole attempts to load a .tconsole file in your home directory
+and in your project directory, in that order, to configure your preferred defaults for TConsole. In many situations you won't need to edit your TConsole configuration files to run TConsole, because it includes a sane set of defaults and attempts to auto-detect Rails applications. 
+
+Here's a commented example configuration file:
+
+``` ruby
+TConsole::Config.run do |config|
+  # Configures the directory where your tests are located
+  config.test_dir = "./test"
+
+  # Include paths that should be added to Ruby's load path
+  config.include_paths = ["./test", "./lib"]
+
+  # Paths that should be preloaded. You'll have to run the reload
+  # command to reload these paths in TConsole
+  config.preload_paths = ["./config/application"]
+
+  # File sets are the named sets of files that can be executed. A file
+  # set named "all" must be included.
+  config.file_sets => {
+    "all" => ["test/**/*_test.rb"],
+    "units" => ["test/units/**/*_test.rb"]
+  }
+
+  # Fail fast specifies whether or not tests should stop executing once
+  # the first failure occurs.
+  config.fail_fast = true
+
+  # Specifies code to be run before loading the environment
+  config.before_load do
+    ENV["RAILS_ENV"] ||= "test"
+  end
+
+  # Specifies code to be run after loading the environment
+  config.after_load do
+    ::Rails.application
+    ::Rails::Engine.class_eval do
+      def eager_load!
+        # turn off eager_loading
+      end
+    end
+  end
+
+  # Specifies code to be run before each test execution
+  config.before_test_run do
+    puts "I'm about to run!!!"
+  end
+end
+```
+
 
 Reporting Issues and Contributing
 ------

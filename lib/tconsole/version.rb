@@ -1,3 +1,3 @@
 module TConsole
-  VERSION = "1.1.0pre12"
+  VERSION = "1.1.0"
 end

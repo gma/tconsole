@@ -40,7 +40,7 @@ module TConsole
         args = Shellwords.shellwords(line)
 
         # save the line unless we're exiting or repeating the last command
-        unless args[0] == "exit" || Readline::HISTORY[Readline::HISTORY.length - 1] == line
+        unless args[0] == "exit" || (Readline::HISTORY.length > 0 && Readline::HISTORY[Readline::HISTORY.length - 1] == line)
           Readline::HISTORY << line
         end
 

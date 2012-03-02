@@ -118,14 +118,21 @@ module TConsole
     # with class names, method names, and test ids using match_patterns.
     def run_tests(globs, match_patterns, message = "Running tests...")
       time = Benchmark.realtime do
-        self.last_result = run_in_fork do
-          puts message
-          puts
+        puts message
+        puts
 
-          paths = []
-          globs.each do |glob|
-            paths.concat(Dir.glob(glob))
-          end
+        paths = []
+        globs.each do |glob|
+          paths.concat(Dir.glob(glob))
+        end
+
+        if paths.length == 0
+          puts "No test files match your requested test set: #{globs.join(",")}."
+          puts "Skipping execution."
+          return nil
+        end
+
+        self.last_result = run_in_fork do
 
           paths.each do |path|
             config.trace("Requested path `#{path}` doesn't exist.") unless File.exist?(path)

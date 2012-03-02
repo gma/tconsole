@@ -1,3 +1,0 @@
-TConsole::Config.run do |config|
-  config.test_dir = "./awesome_sauce"
-end

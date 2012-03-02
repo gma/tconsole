@@ -156,7 +156,7 @@ TConsole::Config.run do |config|
 
   # File sets are the named sets of files that can be executed. A file
   # set named "all" must be included.
-  config.file_sets => {
+  config.file_sets = {
     "all" => ["test/**/*_test.rb"],
     "units" => ["test/units/**/*_test.rb"]
   }

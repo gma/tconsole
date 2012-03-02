@@ -108,8 +108,8 @@ module TConsole
         end
 
         if paths.length == 0
-          puts "No test files match your requested test set: #{globs.join(",")}."
-          puts "Skipping execution."
+          puts ::Term::ANSIColor.yellow("No test files match your requested test set: #{globs.join(",")}.")
+          puts ::Term::ANSIColor.yellow("Skipping execution.")
           return nil
         end
 

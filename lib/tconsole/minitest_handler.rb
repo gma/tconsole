@@ -116,25 +116,34 @@ module TConsole
     end
 
     def status(io = self.output)
-      format = "%d tests, %d assertions, "
 
-      format << COLOR_MAP["P"] if passes > 0
-      format << "%d passes, "
-      format << ::Term::ANSIColor.reset if passes > 0
+      if test_count == 0
+        if !match_patterns.empty?
+          puts ::Term::ANSIColor.yellow("No tests were executed because no tests matching `#{match_patterns.join(", ")}` were found.")
+        else
+          puts ::Term::ANSIColor.yellow("No tests were executed.")
+        end
+      else
+        format = "%d tests, %d assertions, "
 
-      format << COLOR_MAP["F"] if failures > 0
-      format << "%d failures, "
-      format << ::Term::ANSIColor.reset if failures > 0
+        format << COLOR_MAP["P"] if passes > 0
+        format << "%d passes, "
+        format << ::Term::ANSIColor.reset if passes > 0
 
-      format << COLOR_MAP["E"] if errors > 0
-      format << "%d errors, "
-      format << ::Term::ANSIColor.reset if errors > 0
+        format << COLOR_MAP["F"] if failures > 0
+        format << "%d failures, "
+        format << ::Term::ANSIColor.reset if failures > 0
 
-      format << COLOR_MAP["S"] if skips > 0
-      format << "%d skips"
-      format << ::Term::ANSIColor.reset if skips > 0
+        format << COLOR_MAP["E"] if errors > 0
+        format << "%d errors, "
+        format << ::Term::ANSIColor.reset if errors > 0
 
-      io.puts format % [test_count, assertion_count, passes, failures, errors, skips]
+        format << COLOR_MAP["S"] if skips > 0
+        format << "%d skips"
+        format << ::Term::ANSIColor.reset if skips > 0
+
+        io.puts format % [test_count, assertion_count, passes, failures, errors, skips]
+      end
     end
 
     def _run_suite(suite, type)
@@ -161,7 +170,7 @@ module TConsole
         end
 
         if skip
-          0
+          nil
         else
           inst = suite.new method
           inst._assertions = 0
@@ -202,7 +211,7 @@ module TConsole
         end
       end
 
-      return assertions.size, assertions.inject(0) { |sum, n| sum + n }
+      return assertions.select { |n| !n.nil? }.size, assertions.inject(0) { |sum, n| n.nil? ? sum + 0 : sum + n }
     end
 
     def puke(klass, meth, e)

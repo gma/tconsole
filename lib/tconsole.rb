@@ -53,26 +53,21 @@ module TConsole
         server_pid = fork do
           pipe_server.callee!
 
-          begin
-            server = Server.new(config)
+          server = Server.new(config)
 
-            while message = pipe_server.read
-              config.trace("Server Received Message: #{message[:action]}")
-              begin
-                result = server.handle(message)
-                pipe_server.write(result)
-              rescue => e
-                puts
-                puts "An error occured: #{e.message}"
-                config.trace("===========")
-                config.trace(e.backtrace.join("\n"))
-                config.trace("===========")
-                pipe_server.write(nil)
-              end
+          while message = pipe_server.read
+            config.trace("Server Received Message: #{message[:action]}")
+            begin
+              result = server.handle(message)
+              pipe_server.write(result)
+            rescue => e
+              puts
+              puts "An error occured: #{e.message}"
+              config.trace("===========")
+              config.trace(e.backtrace.join("\n"))
+              config.trace("===========")
+              pipe_server.write(nil)
             end
-
-          rescue Interrupt
-            # do nothing here since the outer process will shut things down for us
           end
         end
 

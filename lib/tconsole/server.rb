@@ -13,25 +13,6 @@ module TConsole
       args = message[:args]
 
       send(action, *args)
-      # if action == "load_environment"
-      #   load_environment
-      # elsif action == "run_failed"
-      #   run_failed
-      # elsif action == "show_performance"
-      #   show_performance(message[:limit])
-      # elsif action == "run_info"
-      #   run_info
-      # elsif action == "set"
-      #   set(message[:var], message[:value])
-      # elsif action == "run_file_set"
-      #   run_file_set(message[:set])
-      # elsif action == "run_all_tests"
-      #   run_all_tests(message[:args])
-      # elsif action == "autocomplete"
-      #   autocomplete(message[:text])
-      # elsif action == "exit"
-      #   exit(0)
-      # end
     end
 
     def stop

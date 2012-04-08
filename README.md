@@ -6,7 +6,7 @@ concerning what tests to run, and see their test output. It's also got a
 helpful reload command for when your Rails environment needs to be
 restarted.
 
-TConsole should work in pretty much any Unix environment and will work with apps running Ruby 1.9.3. It can be run on pretty much any test suite that uses MiniTest, including Rails test suites.
+TConsole should work in pretty much any Unix environment and will work with apps running Ruby 1.9. It can be run on pretty much any test suite that uses MiniTest, including Rails test suites.
 
 See it in Action
 ------

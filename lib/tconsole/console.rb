@@ -70,7 +70,8 @@ module TConsole
         end
       end
 
-      true
+      send_message(:stop)
+      false
     end
 
     def send_message(message, *args)

@@ -211,10 +211,17 @@ module TConsole
       puts
 
       if sorted_timings.length == 0
-        puts "No timing data available. Be sure you've run some tests."
+        puts ::Term::ANSIColor.red + "No timing data available. Be sure you've run some tests." + ::Term::ANSIColor.reset
       else
         sorted_timings.reverse[0, limit].each do |timing|
-          puts "#{"%0.6f" % timing[:time]}s #{timing[:suite]}##{timing[:method]}"
+          output = "#{"%0.6f" % timing[:time]}s #{timing[:name]}"
+          if timing[:time] > 1
+            print ::Term::ANSIColor.red, output, ::Term::ANSIColor.reset
+          else
+            print ::Term::ANSIColor.green, output, ::Term::ANSIColor.reset
+          end
+
+          print ::Term::ANSIColor.magenta, " #{last_result.elements[timing[:name]]}", ::Term::ANSIColor.reset, "\n"
         end
       end
 

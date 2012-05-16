@@ -59,7 +59,7 @@ module TConsole
     end
 
     def add_timing(suite, method, time)
-      self.timings << { :suite => suite.to_s, :method => method.to_s, :time => time }
+      self.timings << { :name => "#{suite}##{method}", :time => time }
     end
   end
 end

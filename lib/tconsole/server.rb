@@ -115,6 +115,14 @@ module TConsole
 
         self.last_result = run_in_fork do
 
+          # handle trapping interrupts
+          trap("SIGINT") do
+            puts
+            puts "Trapped interrupt. Exiting tests."
+
+            exit(1)
+          end
+
           paths.each do |path|
             config.trace("Requested path `#{path}` doesn't exist.") unless File.exist?(path)
             require File.expand_path(path)

@@ -21,7 +21,7 @@ module TConsole
       stty_save = `stty -g`.chomp
 
       running = true
-      trap("SIGINT", "SYSTEM_DEFAULT")
+      trap("SIGINT", "IGNORE")
 
       # A little welcome
       puts

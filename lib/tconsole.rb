@@ -22,6 +22,7 @@ module TConsole
 
       running = true
       trap("SIGINT", "IGNORE")
+      trap("SIGTSTP", "IGNORE")
 
       # A little welcome
       puts

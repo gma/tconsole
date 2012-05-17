@@ -35,7 +35,14 @@ module TConsole
         return false
       end
 
-      while line = Readline.readline("tconsole> ", false)
+      prompt = "tconsole> "
+
+      trap("SIGTSTP", "SYSTEM_DEFAULT")
+      trap("SIGCONT") do
+        print prompt
+      end
+
+      while line = Readline.readline(prompt, false)
         line.strip!
         args = Shellwords.shellwords(line)
 

@@ -229,8 +229,11 @@ module TConsole
           else
             @errors += 1
             results.error_count += 1
-            bt = MiniTest::filter_backtrace(e.backtrace).join "\n    "
-            ["E", COLOR_MAP["E"] + "Error:\n#{klass}##{meth} (#{id}):\n" + ::Term::ANSIColor.reset + "#{e.class}: #{e.message}\n    #{bt}\n"]
+
+            filtered_backtrace = Util.filter_backtrace(e.backtrace)
+            backtrace_text = MiniTest::filter_backtrace(filtered_backtrace).join "\n    "
+
+            ["E", COLOR_MAP["E"] + "Error:\n#{klass}##{meth} (#{id}):\n" + ::Term::ANSIColor.reset + "#{e.class}: #{e.message}\n    #{backtrace_text}\n"]
           end
       @report << e[1]
       e[0]

@@ -4,7 +4,7 @@ module TConsole
   class ConfigTest < MiniTest::Unit::TestCase
 
     a "Config" do
-      setup do
+      before do
         @config = TConsole::Config.new
       end
 
@@ -35,7 +35,7 @@ module TConsole
     end
 
     the "Config class" do
-      setup do
+      before do
         TConsole::Config.clear_loaded_configs
       end
 

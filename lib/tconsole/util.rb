@@ -17,5 +17,17 @@ module TConsole
     rescue
       nil
     end
+
+    # Public: Filters a backtrace to exclude things that happened in TConsole
+    #
+    # backtrace: The backtrace array that we're filtering.
+    #
+    # Returns the updated backtrace.
+    def self.filter_backtrace(backtrace)
+      tconsole_path = File.expand_path(File.join(File.dirname(__FILE__), "..", "..")) + File::SEPARATOR
+      backtrace.select do |item|
+        !item.start_with?(tconsole_path)
+      end
+    end
   end
 end

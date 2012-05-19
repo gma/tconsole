@@ -5,7 +5,7 @@ module TConsole
 
     a "Config" do
       before do
-        @config = TConsole::Config.new
+        @config = TConsole::Config.new([])
       end
 
       it "should have appropriate defaults" do

@@ -31,7 +31,7 @@ module TConsole
     # Element names we know
     attr_accessor :cached_elements
 
-    def initialize
+    def initialize(args)
       self.trace_execution = false
       self.test_dir = "./test"
       self.include_paths = ["./test", "./lib"]
@@ -125,8 +125,8 @@ module TConsole
     end
 
     # Returns an appropriate tconsole config based on the environment
-    def self.configure
-      config = Config.new
+    def self.configure(args = [])
+      config = Config.new(args)
 
       if is_rails?
         config.preload_paths = ["./config/application"]

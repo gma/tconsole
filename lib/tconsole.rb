@@ -31,7 +31,7 @@ module TConsole
       # set up the config
       Config.load_config(File.join(Dir.home, ".tconsole"))
       Config.load_config(File.join(Dir.pwd, ".tconsole"))
-      config = Config.configure
+      config = Config.configure(argv)
       config.trace_execution = true if argv.include?("--trace")
 
       config_errors = config.validation_errors

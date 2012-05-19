@@ -215,20 +215,22 @@ module TConsole
     end
 
     def puke(klass, meth, e)
+      id = results.elements["#{klass}##{meth}"]
+
       e = case e
           when MiniTest::Skip then
             @skips += 1
             results.skip_count += 1
-            ["S", COLOR_MAP["S"] + "Skipped:\n#{meth}(#{klass})" + ::Term::ANSIColor.reset + " [#{location e}]:\n#{e.message}\n"]
+            ["S", COLOR_MAP["S"] + "Skipped:\n#{klass}##{meth} (#{id})" + ::Term::ANSIColor.reset + " [#{location e}]:\n#{e.message}\n"]
           when MiniTest::Assertion then
             @failures += 1
             results.failure_count += 1
-            ["F", COLOR_MAP["F"] + "Failure:\n#{meth}(#{klass})" + ::Term::ANSIColor.reset + " [#{location e}]:\n#{e.message}\n"]
+            ["F", COLOR_MAP["F"] + "Failure:\n#{klass}##{meth} (#{id})" + ::Term::ANSIColor.reset + " [#{location e}]:\n#{e.message}\n"]
           else
             @errors += 1
             results.error_count += 1
             bt = MiniTest::filter_backtrace(e.backtrace).join "\n    "
-            ["E", COLOR_MAP["E"] + "Error:\n#{meth}(#{klass}):\n" + ::Term::ANSIColor.reset + "#{e.class}: #{e.message}\n    #{bt}\n"]
+            ["E", COLOR_MAP["E"] + "Error:\n#{klass}##{meth} (#{id}):\n" + ::Term::ANSIColor.reset + "#{e.class}: #{e.message}\n    #{bt}\n"]
           end
       @report << e[1]
       e[0]

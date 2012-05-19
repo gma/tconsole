@@ -42,43 +42,71 @@ module TConsole
         print prompt
       end
 
-      while line = Readline.readline(prompt, false)
-        line.strip!
-        args = Shellwords.shellwords(line)
+      # Run any commands that have been passed
+      result = process_command(@config.run_command)
+      if result == :exit || @config.once
+        send_message(:stop)
+        return false
+      elsif result == :reload
+        send_message(:stop)
+        return true
+      end
 
-        # save the line unless we're exiting or repeating the last command
-        unless args[0] == "exit" || (Readline::HISTORY.length > 0 && Readline::HISTORY[Readline::HISTORY.length - 1] == line)
-          Readline::HISTORY << line
-        end
+      # The command entry loop
+      while command = Readline.readline(prompt, false)
+        command.strip!
+        result = process_command(command)
 
-        if line == ""
-          # do nothing
-        elsif args[0] == "exit"
+        if result == :exit
           send_message(:stop)
-          self.pipe_server = nil
           return false
-        elsif args[0] == "reload"
+        elsif result == :reload
           send_message(:stop)
           return true
-        elsif args[0] == "help"
-          print_help
-        elsif args[0] == "!failed"
-          send_message(:run_failed)
-        elsif args[0] == "!timings"
-          send_message(:show_performance, args[1])
-        elsif args[0] == "info"
-          send_message(:run_info)
-        elsif args[0] == "set"
-          send_message(:set, args[1], args[2])
-        elsif @config.file_sets.has_key?(args[0])
-          send_message(:run_file_set, args[0])
-        else
-          send_message(:run_all_tests, args)
         end
       end
 
       send_message(:stop)
       false
+    end
+
+    # Public: Process a command however it needs to be handled.
+    #
+    # command - The command we need to parse and handle
+    def process_command(command)
+      args = Shellwords.shellwords(command)
+
+      # save the command unless we're exiting or repeating the last command
+      unless args[0] == "exit" || (Readline::HISTORY.length > 0 && Readline::HISTORY[Readline::HISTORY.length - 1] == command)
+        Readline::HISTORY << command
+      end
+
+     if command == ""
+        # do nothing
+      elsif args[0] == "exit"
+        send_message(:stop)
+        self.pipe_server = nil
+        return :exit
+      elsif args[0] == "reload"
+        send_message(:stop)
+        return :reload
+      elsif args[0] == "help"
+        print_help
+      elsif args[0] == "!failed"
+        send_message(:run_failed)
+      elsif args[0] == "!timings"
+        send_message(:show_performance, args[1])
+      elsif args[0] == "info"
+        send_message(:run_info)
+      elsif args[0] == "set"
+        send_message(:set, args[1], args[2])
+      elsif @config.file_sets.has_key?(args[0])
+        send_message(:run_file_set, args[0])
+      else
+        send_message(:run_all_tests, args)
+      end
+
+      nil
     end
 
     def send_message(message, *args)

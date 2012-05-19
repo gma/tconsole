@@ -6,6 +6,7 @@ require "tconsole/pipe_server"
 require "tconsole/test_result"
 require "tconsole/util"
 
+require "optparse"
 require "readline"
 require "benchmark"
 require "drb/drb"
@@ -32,7 +33,6 @@ module TConsole
       Config.load_config(File.join(Dir.home, ".tconsole"))
       Config.load_config(File.join(Dir.pwd, ".tconsole"))
       config = Config.configure(argv)
-      config.trace_execution = true if argv.include?("--trace")
 
       config_errors = config.validation_errors
       if config_errors.length > 0

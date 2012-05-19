@@ -31,7 +31,13 @@ module TConsole
     # Element names we know
     attr_accessor :cached_elements
 
-    def initialize(args)
+    # First command to run when tconsole loads
+    attr_accessor :run_command
+
+    # Only runs the command passed on the command line, and then exits
+    attr_accessor :once
+
+    def initialize(argv)
       self.trace_execution = false
       self.test_dir = "./test"
       self.include_paths = ["./test", "./lib"]
@@ -41,12 +47,37 @@ module TConsole
         "all" => ["#{test_dir}/**/*_test.rb"]
       }
 
+      # load any args into this config that were passed
+      load_args(argv)
+
       @after_load = nil
       @before_load = nil
       @before_test_run = nil
 
       @cached_suite_counts = {}
       @cached_elements = {}
+    end
+
+    def option_parser
+      @option_parser ||= OptionParser.new do |opts|
+        opts.on("-t", "--trace", "Enable verbose output.") do
+          self.trace_execution = true
+        end
+
+        opts.on("-o", "--once", "Run whatever command is passed and then exit.") do
+          self.once = true
+        end
+      end
+    end
+
+    # Public: Loads any passed command line arguments into the config.
+    #
+    # argv  - The array of command line arguments we're loading
+    def load_args(argv)
+      args = argv.clone
+
+      option_parser.parse!(args)
+      self.run_command = args.join(" ")
     end
 
     def trace?
@@ -125,8 +156,8 @@ module TConsole
     end
 
     # Returns an appropriate tconsole config based on the environment
-    def self.configure(args = [])
-      config = Config.new(args)
+    def self.configure(argv = [])
+      config = Config.new(argv)
 
       if is_rails?
         config.preload_paths = ["./config/application"]

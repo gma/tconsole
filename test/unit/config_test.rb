@@ -34,6 +34,26 @@ module TConsole
       end
     end
 
+    a "Config with command line arguments" do
+      it "should set up tracing correctly" do
+        @config = Config.new(Shellwords.shellwords("--trace"))
+
+        assert @config.trace_execution
+      end
+
+      it "should set up only running the passed command and exiting" do
+        @config = Config.new(Shellwords.shellwords("--once all"))
+
+        assert @config.once
+      end
+
+      it "should set all remaining unparsed text to be the first command to run" do
+        @config = Config.new(Shellwords.shellwords("--trace set fast on"))
+
+        assert_equal "set fast on", @config.run_command
+      end
+    end
+
     the "Config class" do
       before do
         TConsole::Config.clear_loaded_configs

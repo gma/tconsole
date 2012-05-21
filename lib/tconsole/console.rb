@@ -45,10 +45,8 @@ module TConsole
       # Run any commands that have been passed
       result = process_command(@config.run_command)
       if result == :exit || @config.once
-        send_message(:stop)
         return false
       elsif result == :reload
-        send_message(:stop)
         return true
       end
 
@@ -58,15 +56,12 @@ module TConsole
         result = process_command(command)
 
         if result == :exit
-          send_message(:stop)
           return false
         elsif result == :reload
-          send_message(:stop)
           return true
         end
       end
 
-      send_message(:stop)
       false
     end
 

@@ -134,6 +134,27 @@ And then finally, you can run the `exit` command to quit:
 
 	> exit
 
+Command Line Options
+-----
+
+Since TConsole's primarily meant to be run as an interactive console, it
+doesn't have many command line arguments, but there are a few.
+TConsole also passes any parameters that it doesn't know through to be
+run as its initial command. So, for example:
+
+```
+> tconsole all
+```
+
+passes `all` through as the first command to be run, so that command
+would start TConsole and immediately run all tests. There's a `--once`
+option that can be used if you'd simply like to run a single command by
+passing it to the TConsole command in then exit.
+
+The only other TConsole command line option is `--trace`. `--trace` is
+primarily useful for diagnosing problems with TConsole.
+
+
 Configuration Files
 ------
 

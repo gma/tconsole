@@ -137,7 +137,7 @@ And then finally, you can run the `exit` command to quit:
 Command Line Options
 -----
 
-Since TConsole's primarily meant to be run as an interactive console, it
+Since TConsole is primarily meant to be run as an interactive console, it
 doesn't have many command line arguments, but there are a few.
 TConsole also passes any parameters that it doesn't know through to be
 run as its initial command. So, for example:

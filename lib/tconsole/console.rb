@@ -44,6 +44,7 @@ module TConsole
 
       # Run any commands that have been passed
       result = process_command(@config.run_command)
+      @config.run_command = ""
       if result == :exit || @config.once
         return false
       elsif result == :reload

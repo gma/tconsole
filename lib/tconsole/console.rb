@@ -63,6 +63,7 @@ module TConsole
         end
       end
 
+      send_message(:stop)
       false
     end
 

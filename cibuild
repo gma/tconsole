@@ -1,0 +1,4 @@
+mkdir -p vendor
+bundle install --path vendor/gems --binstubs
+
+rake test

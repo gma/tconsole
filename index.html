@@ -1,0 +1,273 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>TConsole by commondream</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>TConsole</h1>
+        <p>The fastest way to iterate on your MiniTest tests!</p>
+        <p class="view"><a href="https://github.com/commondream/tconsole">View the Project on GitHub <small>commondream/tconsole</small></a></p>
+        <ul>
+          <li><a href="https://github.com/commondream/tconsole/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/commondream/tconsole/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/commondream/tconsole">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>TConsole is a testing console for Rails. It allows you to issue commands
+concerning what tests to run, and see their test output. It's also got a
+helpful reload command for when your Rails environment needs to be
+restarted.</p>
+
+<p>TConsole should work in pretty much any Unix environment and will work with apps running Ruby 1.9. It can be run on pretty much any test suite that uses MiniTest, including Rails test suites.</p>
+
+<h2>See it in Action</h2>
+
+<p>There's a quick screencast on Vimeo about TConsole's basic features: <a href="https://vimeo.com/37641415">Meet TConsole!</a></p>
+
+<h2>Why use TConsole?</h2>
+
+<ul>
+<li>A large amount of time is wasted loading the Rails environment each time you run the Rails testing rake tasks. TConsole loads the environment when you start the console and whenever you reload the environment, but doesn't have to reload the environment for each test execution.</li>
+<li>The Rails rake task syntax <code>bundle exec rake test:units TEST=test/unit/user_test.rb</code> can be pretty verbose when you're running specific tests. Yeah, there are tricks you can use to shorten things up, but still, that's crazy long. tconsole lets you just type <code>test/unit/user_test.rb</code> to get that specific test file to run. With TConsole  you can just type <code>UserTest</code> and the test runs!</li>
+<li>TConsole makes it dead simple to review how long your tests are taking to run and pinpoint your slowest running tests.</li>
+<li>Re-running failed tests is as easy as typing <code>!failed</code> with TConsole.</li>
+</ul><h2>What about Spork?</h2>
+
+<p><a href="https://github.com/sporkrb/spork">Spork</a>'s really cool, and it was my primary motivation behind writing tconsole, but I've always felt like having an extra console open for my spork server and another to run my commands is a bit heavy for what I want to do. Beyond that, I couldn't ever figure out how to get Spork to work with test/unit, and since me and DHH are the only two people who still use test/unit I figured it was up to me to come up with something that worked great. If Spork's your cup of tea, though, stop reading this and use what you like.</p>
+
+<h2>What about rspec?</h2>
+
+<p>We've decided to focus on integrating with MiniTest as tightly as possible, rather than worrying about rspec support.</p>
+
+<h2>Installing TConsole</h2>
+
+<pre><code>gem install tconsole
+</code></pre>
+
+<p>Prereleases of TConsole come out pretty frequently. You can install the latest prerelease version with:</p>
+
+<pre><code>gem install tconsole --pre
+</code></pre>
+
+<p>If you're using bundler, you probably want to simply add TConsole to your Gemfile:</p>
+
+<pre><code>gem "tconsole"
+</code></pre>
+
+<h2>How to use TConsole</h2>
+
+<p>In your shell of choice, cd into your Rails project's directory and then run <code>bundle exec tconsole</code> to fire up the console. You should see something like this:</p>
+
+<pre><code>bundle exec tconsole
+
+Loading your Rails environment...
+Environment loaded in 7.160264s.
+
+&gt;
+</code></pre>
+
+<p>Now that you're in the console, let's test out the <code>all</code> command! Running <code>all</code> from the console runs all of your unit, functional, and integration tests:</p>
+
+<pre><code>&gt; all
+Running tests...
+
+Run options:
+
+# Running tests:
+
+....................................................................................
+
+Finished tests in 6.054574s, 6.4999 tests/s, 10.5822 assertions/s.
+
+39 tests, 45 assertions, 0 failures, 0 errors, 0 skips
+
+Test time (including load): 82.806741s
+
+&gt;
+</code></pre>
+
+<p>If you want to focus in on a particular subset of your tests, like units, functionals, or integration, just enter that keyword:</p>
+
+<pre><code>&gt; units
+
+&gt; functionals
+
+&gt; integration
+</code></pre>
+
+<p>You can also specify to run all tests in a specific class:</p>
+
+<pre><code>&gt; UserTest
+</code></pre>
+
+<p>You can dig a bit deeper and just run a particular test in that file as
+well:</p>
+
+<pre><code>&gt; UserTest#test_that_user_is_healthy
+</code></pre>
+
+<p>You can list more than just one class or class and method to run, and
+TConsole will run them all.</p>
+
+<pre><code>&gt; UserTest InvoiceTest SubscriptionTest#test_that_renew_renews_the_subscription
+</code></pre>
+
+<p>There are a few special ! commands that use data from past test runs. The <code>!failed</code> command will rerun the set of tests that failed during the last run:</p>
+
+<pre><code>&gt; !failed
+</code></pre>
+
+<p>There's also a <code>!timings</code> command that will show you a listing of your last test run's test times, sorted to help you
+improve slow tests:</p>
+
+<pre><code>&gt; !timings
+
+Timings from last run:
+
+0.042632s PostTest#test_new_post_should_not_be_published
+0.033892s PostTest#test_post_should_have_a_title
+0.033134s PostsControllerTest#test_can_reach_all_posts
+0.007098s PostsControllerTest#test_grabs_posts
+0.006212s PostsControllerTest#test_displays_published_posts_by_default
+0.006107s PostTest#test_post_cannot_have_an_empty_body
+0.002197s PostTest#test_post_should_have_a_publish_date_set_when_published
+0.001937s PostTest#test_post_cannot_have_an_empty_title
+0.001232s PostTest#test_post_should_have_an_initial_state
+0.001128s PostTest#test_post's_state_should_change_when_published
+0.001056s PostTest#test_returning_only_published_posts
+0.000923s PostTest#test_post_should_have_respond_to_published_appropriately
+0.000770s PostTest#test_post_should_have_a_body
+</code></pre>
+
+<p>You can turn on the Fail Fast feature to cause TConsole to stop running
+tests as soon as the first test fails. To enable fail fast simply enter:</p>
+
+<blockquote>
+<p>set fast on</p>
+</blockquote>
+
+<p>In the console. You can disable Fail Fast again with:</p>
+
+<blockquote>
+<p>set fast off</p>
+</blockquote>
+
+<p>If you update your environment, maybe by editing your Gemfile or changing one of your application's configuration files, you can use the <code>reload</code> command to reload the entire environment:</p>
+
+<pre><code>&gt; reload
+</code></pre>
+
+<p>And then finally, you can run the <code>exit</code> command to quit:</p>
+
+<pre><code>&gt; exit
+</code></pre>
+
+<h2>Command Line Options</h2>
+
+<p>Since TConsole is primarily meant to be run as an interactive console, it
+doesn't have many command line arguments, but there are a few.
+TConsole also passes any parameters that it doesn't know through to be
+run as its initial command. So, for example:</p>
+
+<pre><code>&gt; tconsole all
+</code></pre>
+
+<p>passes <code>all</code> through as the first command to be run, so that command
+would start TConsole and immediately run all tests. There's a <code>--once</code>
+option that can be used if you'd simply like to run a single command by
+passing it to the TConsole command in then exit.</p>
+
+<p>The only other TConsole command line option is <code>--trace</code>. <code>--trace</code> is
+primarily useful for diagnosing problems with TConsole.</p>
+
+<h2>Configuration Files</h2>
+
+<p>TConsole attempts to load a .tconsole file in your home directory
+and in your project directory, in that order, to configure your preferred defaults for TConsole. In many situations you won't need to edit your TConsole configuration files to run TConsole, because it includes a sane set of defaults and attempts to auto-detect Rails applications. </p>
+
+<p>Here's a commented example configuration file:</p>
+
+<div class="highlight">
+<pre><span class="no">TConsole</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="c1"># Configures the directory where your tests are located</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">test_dir</span> <span class="o">=</span> <span class="s2">"./test"</span>
+
+  <span class="c1"># Include paths that should be added to Ruby's load path</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">include_paths</span> <span class="o">=</span> <span class="o">[</span><span class="s2">"./test"</span><span class="p">,</span> <span class="s2">"./lib"</span><span class="o">]</span>
+
+  <span class="c1"># Paths that should be preloaded. You'll have to run the reload</span>
+  <span class="c1"># command to reload these paths in TConsole</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">preload_paths</span> <span class="o">=</span> <span class="o">[</span><span class="s2">"./config/application"</span><span class="o">]</span>
+
+  <span class="c1"># File sets are the named sets of files that can be executed. A file</span>
+  <span class="c1"># set named "all" must be included.</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">file_sets</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"all"</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"test/**/*_test.rb"</span><span class="o">]</span><span class="p">,</span>
+    <span class="s2">"units"</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">"test/units/**/*_test.rb"</span><span class="o">]</span>
+  <span class="p">}</span>
+
+  <span class="c1"># Fail fast specifies whether or not tests should stop executing once</span>
+  <span class="c1"># the first failure occurs.</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">fail_fast</span> <span class="o">=</span> <span class="kp">true</span>
+
+  <span class="c1"># Specifies code to be run before loading the environment</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">before_load</span> <span class="k">do</span>
+    <span class="no">ENV</span><span class="o">[</span><span class="s2">"RAILS_ENV"</span><span class="o">]</span> <span class="o">||=</span> <span class="s2">"test"</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Specifies code to be run after loading the environment</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">after_load</span> <span class="k">do</span>
+    <span class="o">::</span><span class="no">Rails</span><span class="o">.</span><span class="n">application</span>
+    <span class="o">::</span><span class="no">Rails</span><span class="o">::</span><span class="no">Engine</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+      <span class="k">def</span> <span class="nf">eager_load!</span>
+        <span class="c1"># turn off eager_loading</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Specifies code to be run before each test execution</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">before_test_run</span> <span class="k">do</span>
+    <span class="nb">puts</span> <span class="s2">"I'm about to run!!!"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<h2>Reporting Issues and Contributing</h2>
+
+<p>Feel free to report issues in the issue tracker at <a href="https://github.com/commondream/tconsole/issues">https://github.com/commondream/tconsole/issues</a>. Be sure to include the versions of Ruby, Rails, and your operating system. For bonus points, fork the project and send me a pull request with the fix for the issue you're seeing.</p>
+
+<p><em>How embarrassing?!?! A testing tool with no tests?</em> At first TConsole was just a bit of experimental code, so test coverage is light. I am working on improving that, though.</p>
+
+<h2>License</h2>
+
+<p>Copyright (c) 2012 Alan Johnson</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/commondream">commondream</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>

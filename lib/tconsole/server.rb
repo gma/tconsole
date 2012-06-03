@@ -160,7 +160,7 @@ module TConsole
       end
 
       puts
-      puts "Test time (including load): #{"%0.6f" % time}s"
+      puts "Tests ran in #{"%0.6f" % time}s. Finished at #{Time.now.strftime('%Y-%m-%d %l:%M:%S %p')}."
       puts
     end
 

@@ -115,14 +115,6 @@ module TConsole
 
         self.last_result = run_in_fork do
 
-          # handle trapping interrupts
-          trap("SIGINT") do
-            puts
-            puts "Trapped interrupt. Exiting tests."
-
-            exit(1)
-          end
-
           paths.each do |path|
             config.trace("Requested path `#{path}` doesn't exist.") unless File.exist?(path)
             require File.expand_path(path)
@@ -138,8 +130,29 @@ module TConsole
             require File.join(File.dirname(__FILE__), "minitest_handler")
 
             config.trace("Running tests.")
-            result = MiniTestHandler.run(match_patterns, config)
+            runner = MiniTestHandler.setup(match_patterns, config)
+
+            # Handle trapping interrupts
+            trap("SIGINT") do
+              puts
+              puts "Trapped interrupt. Halting tests."
+
+              runner.interrupted = true
+            end
+
+            runner.run
+
+            result = runner.results
+
+            # Make sure minitest doesn't run automatically
+            MiniTestHandler.patch_minitest
+
             config.trace("Finished running tests.")
+
+            if runner.interrupted
+              puts ::Term::ANSIColor.red("Test run was interrupted.")
+            end
+
           elsif defined?(::Test::Unit)
             puts "Sorry, but tconsole doesn't support Test::Unit yet"
           elsif defined?(::RSpec)

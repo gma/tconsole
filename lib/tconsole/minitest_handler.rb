@@ -1,6 +1,6 @@
 module TConsole
   class MiniTestHandler
-    def self.run(match_patterns, config)
+    def self.setup(match_patterns, config)
       # Make sure we have a recent version of minitest, and use it
       if ::MiniTest::Unit.respond_to?(:runner=)
         ::MiniTest::Unit.runner = TConsole::MiniTestUnit.new(match_patterns, config)
@@ -8,14 +8,7 @@ module TConsole
         raise "MiniTest v#{MiniTest::Unit::VERSION} is not compatible with tconsole. Please load a more recent version of MiniTest"
       end
 
-      # Run it
-      runner = ::MiniTest::Unit.runner
-      runner.run
-
-      # Make sure that minitest doesn't run automatically when the process exits
-      patch_minitest
-
-      runner.results
+      ::MiniTest::Unit.runner
     end
 
     # Preloads our element cache for autocompletion. Assumes tests are already loaded
@@ -62,7 +55,7 @@ module TConsole
       "P" => ::Term::ANSIColor.green
     }
 
-    attr_accessor :match_patterns, :config, :results, :passes
+    attr_accessor :match_patterns, :config, :results, :passes, :interrupted
 
     def initialize(match_patterns, config)
       self.match_patterns = match_patterns
@@ -158,7 +151,7 @@ module TConsole
         suite_id = results.elements[suite.to_s]
 
         # If we're using failed fast mode and we already failed, just return
-        skip = true if @failed_fast
+        skip = true if @failed_fast || interrupted
 
         # If we've got match patterns, see if this matches them
         if !match_patterns.empty?

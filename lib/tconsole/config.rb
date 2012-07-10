@@ -162,16 +162,24 @@ module TConsole
       if is_rails?
         config.preload_paths = ["./config/application"]
         config.include_paths = ["./test"]
-        config.file_sets = {
-          "all" => ["#{config.test_dir}/unit/**/*_test.rb", "#{config.test_dir}/functional/**/*_test.rb",
-            "#{config.test_dir}/integration/**/*_test.rb"],
-          "units" => ["#{config.test_dir}/unit/**/*_test.rb"],
-          "unit" => ["#{config.test_dir}/unit/**/*_test.rb"],
-          "functionals" => ["#{config.test_dir}/functional/**/*_test.rb"],
-          "functional" => ["#{config.test_dir}/functional/**/*_test.rb"],
+        test_paths = if defined?(:MiniTest) && ::MiniTest.const_defined?(:Rails)
+          {
+            "models" => ["#{config.test_dir}/models/**/*_test.rb"],
+            "controllers" => ["#{config.test_dir}/controllers/**/*_test.rb"],
+            "helpers" => ["#{config.test_dir}/helpers/**/*_test.rb"]
+          }
+        else
+          {
+            "units" => ["#{config.test_dir}/unit/**/*_test.rb"],
+            "unit" => ["#{config.test_dir}/unit/**/*_test.rb"],
+            "functionals" => ["#{config.test_dir}/functional/**/*_test.rb"],
+            "functional" => ["#{config.test_dir}/functional/**/*_test.rb"]
+          }
+        end
+        config.file_sets = test_paths.merge(
+          "all" => ["#{config.test_dir}/**/*_test.rb"],
           "integration" => ["#{config.test_dir}/integration/**/*_test.rb"]
-        }
-
+        )
 
         config.before_load do
           ENV["RAILS_ENV"] ||= "test"

@@ -78,7 +78,7 @@ module TConsole
         Readline::HISTORY << command
       end
 
-     if command == ""
+      if command == ""
         # do nothing
       elsif args[0] == "exit"
         send_message(:stop)

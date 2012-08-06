@@ -11,8 +11,13 @@ module TConsole
     def handle(message)
       action = message[:action]
       args = message[:args]
-
-      send(action, *args)
+      if Kernel.one_eight?
+        self.class.instance_method(action).arity > 0 ?
+          send(action, *args) :
+          send(action)
+      else
+        send(action, *args)
+      end
     end
 
     def stop

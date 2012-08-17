@@ -97,6 +97,8 @@ module TConsole
         send_message(:run_info)
       elsif args[0] == "set"
         send_message(:set, args[1], args[2])
+      elsif args[0].start_with?(".")
+        send_message(:shell, command[1, command.length - 1])
       elsif @config.file_sets.has_key?(args[0])
         send_message(:run_file_set, args[0])
       else
@@ -122,6 +124,7 @@ module TConsole
       puts "!failed                     # Runs the last set of failing tests"
       puts "!timings [limit]            # Lists the timings for the last test run, sorted."
       puts "[filename] [test_pattern]   # Run the tests contained in the given file"
+      puts ".[command]                  # Executes the given command in a subshell"
       puts
       puts "Running file sets"
       puts

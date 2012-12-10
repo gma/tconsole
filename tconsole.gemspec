@@ -24,5 +24,5 @@ Gem::Specification.new do |s|
   # specify any dependencies here; for example:
   # s.add_development_dependency "rspec"
   s.add_runtime_dependency "term-ansicolor", "~> 1.0.7"
-  s.add_runtime_dependency "minitest", "~> 3.4.0"
+  s.add_runtime_dependency "minitest", "~> 4.3.0"
 end

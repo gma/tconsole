@@ -13,6 +13,12 @@ require "drb/drb"
 require "term/ansicolor"
 require "shellwords"
 
+if RUBY_VERSION =~ /1.8/
+  def Kernel.one_eight?; true; end
+  def Dir.home; File.expand_path('~'); end
+  def Dir.exists?(path); File.exists?(path) and File.directory?(path); end
+end
+
 module TConsole
   class Runner
 

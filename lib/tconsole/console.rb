@@ -74,7 +74,7 @@ module TConsole
       args = Shellwords.shellwords(command)
 
       # save the command unless we're exiting or repeating the last command
-      unless args[0] == "exit" || (Readline::HISTORY.length > 0 && Readline::HISTORY[Readline::HISTORY.length - 1] == command)
+      unless args[0] == "exit" || last_command == command
         Readline::HISTORY << command
       end
 
@@ -159,6 +159,15 @@ module TConsole
 
     def history_file
       File.join(ENV['HOME'], ".tconsole_history")
+    end
+
+    def last_command
+      return nil if Readline::HISTORY.length <= 0
+      if Kernel.one_eight?
+        Readline::HISTORY.to_a[Readline::HISTORY.length - 1]
+      else
+        Readline::HISTORY[Readline::HISTORY.length - 1]
+      end
     end
 
     # Stores last 50 items in history to $HOME/.tconsole_history

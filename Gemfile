@@ -5,3 +5,7 @@ gemspec
 
 gem "rake"
 gem "nutrasuite"
+
+platforms :mri_18 do
+  gem "minitest"
+end

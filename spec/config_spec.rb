@@ -4,6 +4,7 @@ describe TConsole::Config do
   context "a Config without arguments" do
     before do
       @config = TConsole::Config.new([])
+      @config.test_dir = "./spec/fixtures/minitest"
     end
 
     context "when configured test directory doesn't exist" do

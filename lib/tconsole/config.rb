@@ -39,7 +39,7 @@ module TConsole
 
     def initialize(argv)
       self.trace_execution = false
-      self.test_dir = "./test"
+      self.test_dir = "test"
       self.include_paths = ["./test", "./lib"]
       self.preload_paths = []
       self.fail_fast = false

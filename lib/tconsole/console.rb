@@ -2,8 +2,6 @@ module TConsole
   class Console
     KNOWN_COMMANDS = ["exit", "reload", "help", "info", "!failed", "!timings", "set"]
 
-    attr_accessor :pipe_server
-
     def initialize(config)
       @config = config
       read_history
@@ -29,12 +27,7 @@ module TConsole
     end
 
     # Returns true if the app should keep running, false otherwise
-    def read_and_execute
-      if pipe_server.nil?
-        puts "No connection to test environment. Exiting."
-        return false
-      end
-
+    def read_and_execute(pipe_server)
       prompt = "tconsole> "
 
       trap("SIGTSTP", "SYSTEM_DEFAULT")
@@ -43,7 +36,7 @@ module TConsole
       end
 
       # Run any commands that have been passed
-      result = process_command(@config.run_command)
+      result = process_command(pipe_server, @config.run_command)
       @config.run_command = ""
       if result == :exit || @config.once
         return false
@@ -54,7 +47,7 @@ module TConsole
       # The command entry loop
       while command = Readline.readline(prompt, false)
         command.strip!
-        result = process_command(command)
+        result = process_command(pipe_server, command)
 
         if result == :exit
           return false
@@ -69,8 +62,9 @@ module TConsole
 
     # Public: Process a command however it needs to be handled.
     #
+    # pipe_server - The pipe server we're working with
     # command - The command we need to parse and handle
-    def process_command(command)
+    def process_command(pipe_server, command)
       args = Shellwords.shellwords(command)
 
       # save the command unless we're exiting or repeating the last command
@@ -81,34 +75,33 @@ module TConsole
       if command == ""
         # do nothing
       elsif args[0] == "exit"
-        send_message(:stop)
-        self.pipe_server = nil
+        send_message(pipe_server, :stop)
         return :exit
       elsif args[0] == "reload"
-        send_message(:stop)
+        send_message(pipe_server, :stop)
         return :reload
       elsif args[0] == "help"
         print_help
       elsif args[0] == "!failed"
-        send_message(:run_failed)
+        send_message(pipe_server, :run_failed)
       elsif args[0] == "!timings"
-        send_message(:show_performance, args[1])
+        send_message(pipe_server, :show_performance, args[1])
       elsif args[0] == "info"
-        send_message(:run_info)
+        send_message(pipe_server, :run_info)
       elsif args[0] == "set"
         send_message(:set, args[1], args[2])
       elsif args[0].start_with?(".")
-        send_message(:shell, command[1, command.length - 1])
+        send_message(pipe_server, :shell, command[1, command.length - 1])
       elsif @config.file_sets.has_key?(args[0])
-        send_message(:run_file_set, args[0])
+        send_message(pipe_server, :run_file_set, args[0])
       else
-        send_message(:run_all_tests, args)
+        send_message(pipe_server, :run_all_tests, args)
       end
 
       nil
     end
 
-    def send_message(message, *args)
+    def send_message(pipe_server, message, *args)
       pipe_server.write({:action => message.to_sym, :args => args})
       pipe_server.read
     end

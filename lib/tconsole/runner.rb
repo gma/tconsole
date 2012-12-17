@@ -1,7 +1,7 @@
 module TConsole
   class Runner
 
-    attr_accessor :config, :running, :console, :stty_save
+    attr_accessor :config, :console, :stty_save
 
     # Public: Sets up the new runner's config.
     def initialize(argv)
@@ -9,15 +9,13 @@ module TConsole
       Config.load_config(File.join(Dir.home, ".tconsole"))
       Config.load_config(File.join(Dir.pwd, ".tconsole"))
       @config = Config.configure(argv)
-
-      # Set up our running variable
-      self.running = true
     end
 
     # Spawns a new environment. Looks at the results of the environment to determine whether to stop or
     # keep running
     def run
-      running = true
+      prepare_process
+
       welcome_message
       exit(1) if print_config_errors
 
@@ -25,22 +23,28 @@ module TConsole
       console = Console.new(@config)
 
       # Start the server
-      while running
-        environment_run_loop(console)
+      while environment_run_loop(console)
+        # just need to run the loop
       end
+
       console.store_history
 
-      puts
-      puts "Exiting. Bye!"
-      system("stty", stty_save);
+      cleanup_process
     end
 
-    # Set up the process and console.
+    # Internal: Set up the process and console.
     def prepare_process
       self.stty_save = `stty -g`.chomp
 
       trap("SIGINT", "IGNORE")
       trap("SIGTSTP", "IGNORE")
+    end
+
+    # Internal: Cleans up the process at the end of execution.
+    def cleanup_process
+      puts
+      puts "Exiting. Bye!"
+      system("stty", self.stty_save);
     end
 
     # Internal: Prints the tconsole welcome message.
@@ -67,6 +71,8 @@ module TConsole
     #
     # This run loop handles spawning a new tconsole environment - it's basically
     # just there to handle reloads.
+    #
+    # Returns false if tconsole needs to stop, true otherwise.
     def environment_run_loop(console)
       pipe_server = PipeServer.new
 
@@ -76,18 +82,20 @@ module TConsole
       end
 
       pipe_server.caller!
+      load_environment(pipe_server)
 
-      load_environment
-
-      process_command
+      continue = console.read_and_execute(pipe_server)
+      config.trace("Console read loop returned - continue: #{continue}")
 
       Process.waitall
+
+      continue
     end
 
     # Internal: Asks the server to load the environment.
     #
     # Returns true if the environment was loaded, or false otherwise.
-    def load_environment
+    def load_environment(pipe_server)
       config.trace("Attempting to load environment.")
       pipe_server.write({:action => "load_environment"})
 
@@ -120,14 +128,6 @@ module TConsole
           pipe_server.write(nil)
         end
       end
-    end
-
-    # Internal: Prompts for commands and runs them until exit or relaod
-    # is issued.
-    def process_commands
-      console.pipe_server = pipe_server
-      self.running = console.read_and_execute
-      console.pipe_server = nil
     end
   end
 end

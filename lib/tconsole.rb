@@ -9,7 +9,6 @@ require "tconsole/util"
 require "optparse"
 require "readline"
 require "benchmark"
-require "drb/drb"
 require "term/ansicolor"
 require "shellwords"
 
@@ -73,8 +72,6 @@ module TConsole
         end
 
         pipe_server.caller!
-
-        wait_until = Time.now + 10
 
         config.trace("Attempting to load environment.")
         pipe_server.write({:action => "load_environment"})

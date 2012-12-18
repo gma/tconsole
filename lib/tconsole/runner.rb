@@ -23,7 +23,7 @@ module TConsole
       console = Console.new(@config)
 
       # Start the server
-      while environment_run_loop(console)
+      while console_run_loop(console)
         # just need to run the loop
       end
 
@@ -63,10 +63,11 @@ module TConsole
     # Internal: Environment reload run loop.
     #
     # This run loop handles spawning a new tconsole environment - it's basically
-    # just there to handle reloads.
+    # just there to handle reloads. Also calls out to the input loop for the
+    # console.
     #
     # Returns false if tconsole needs to stop, true otherwise.
-    def environment_run_loop(console)
+    def console_run_loop(console)
       pipe_server = PipeServer.new
 
       reporter.trace("Forking test server.")

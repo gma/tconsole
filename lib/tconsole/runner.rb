@@ -4,7 +4,7 @@ module TConsole
     attr_accessor :config, :reporter, :console, :stty_save
 
     # Public: Sets up the new runner's config.
-    def initialize(argv)
+    def initialize(argv = [])
       # try to load the default configs
       Config.load_config(File.join(Dir.home, ".tconsole"))
       Config.load_config(File.join(Dir.pwd, ".tconsole"))

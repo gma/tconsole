@@ -14,7 +14,7 @@ module TConsole
 
     # Public: Outputs an error message.
     def error(message = "")
-      puts error
+      puts message
     end
 
     # Public: Outputs a trace message, when needed.

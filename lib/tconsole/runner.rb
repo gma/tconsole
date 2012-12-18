@@ -114,13 +114,10 @@ module TConsole
         rescue => e
           reporter.error
           reporter.error("An error occured: #{e.message}")
-          reporter.trace("===========")
-          reporter.trace(e.backtrace.join("\n"))
-          reporter.trace("===========")
+          reporter.trace_backtrace(e)
           pipe_server.write(nil)
         end
       end
     end
   end
 end
-

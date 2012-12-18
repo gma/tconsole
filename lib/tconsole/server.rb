@@ -44,9 +44,8 @@ module TConsole
 
           result = true
         rescue Exception => e
-          puts "Error - Loading your environment failed: #{e.message}"
-          reporter.trace("====")
-          reporter.trace("    #{e.backtrace.join("\n    ")}")
+          reporter.error("Error - Loading your environment failed: #{e.message}")
+          reporter.trace_backtrace(e)
           return false
         end
 

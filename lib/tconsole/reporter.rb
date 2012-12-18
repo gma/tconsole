@@ -22,6 +22,13 @@ module TConsole
       puts "[tconsole trace] #{message}" if config.trace?
     end
 
+    # Public: Prints a backtrace out.
+    def trace_backtrace(exception)
+      reporter.trace("===========")
+      reporter.trace(exception.backtrace.join("\n"))
+      reporter.trace("===========")
+    end
+
     # Public: Outputs the tconsole welcome message
     def welcome_message
       info

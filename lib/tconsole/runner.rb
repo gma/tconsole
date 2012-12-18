@@ -111,7 +111,6 @@ module TConsole
     # Internal: Run loop for the server.
     def server_run_loop(pipe_server)
       pipe_server.callee!
-
       server = Server.new(config)
 
       while message = pipe_server.read

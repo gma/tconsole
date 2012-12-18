@@ -91,7 +91,7 @@ module TConsole
       elsif args[0] == "set"
         send_message(:set, args[1], args[2])
       elsif args[0].start_with?(".")
-        send_message(pipe_server, :shell, command[1, command.length - 1])
+        shell_command(command[1, command.length - 1])
       elsif @config.file_sets.has_key?(args[0])
         send_message(pipe_server, :run_file_set, args[0])
       else
@@ -104,6 +104,20 @@ module TConsole
     def send_message(pipe_server, message, *args)
       pipe_server.write({:action => message.to_sym, :args => args})
       pipe_server.read
+    end
+
+    # Internal: Runs a shell command on the console and outputs the results.
+    def shell_command(command)
+      system(command)
+
+      result = $?
+
+      puts
+      if result.exitstatus == 0
+        puts ::Term::ANSIColor.green + "Command exited with status code: 0" + ::Term::ANSIColor.reset
+      else
+        puts ::Term::ANSIColor.red + "Command exited with status code: #{result.exitstatus}" + ::Term::ANSIColor.reset
+      end
     end
 
     # Prints a list of available commands

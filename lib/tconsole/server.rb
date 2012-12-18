@@ -270,25 +270,5 @@ module TConsole
         puts
       end
     end
-
-    # Internal: Runs the given command in the shell.
-    #
-    # command - the command to execute
-    #
-    # Examples
-    #
-    #   shell("ls -la")
-    def shell(command)
-      system(command)
-
-      result = $?
-
-      puts
-      if result.exitstatus == 0
-        puts ::Term::ANSIColor.green + "Command exited with status code: 0" + ::Term::ANSIColor.reset
-      else
-        puts ::Term::ANSIColor.red + "Command exited with status code: #{result.exitstatus}" + ::Term::ANSIColor.reset
-      end
-    end
   end
 end

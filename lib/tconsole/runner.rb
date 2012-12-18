@@ -16,7 +16,7 @@ module TConsole
     # keep running
     def run
       prepare_process
-      welcome_message
+      reporter.welcome_message
       exit(1) if print_config_errors
 
       # Set up our console input handling and history
@@ -42,15 +42,8 @@ module TConsole
 
     # Internal: Cleans up the process at the end of execution.
     def cleanup_process
-      puts
-      puts "Exiting. Bye!"
+      reporter.exit_message
       system("stty", self.stty_save);
-    end
-
-    # Internal: Prints the tconsole welcome message.
-    def welcome_message
-      puts
-      puts "Welcome to tconsole (v#{TConsole::VERSION}). Type 'help' for help or 'exit' to quit."
     end
 
     # Internal: Prints config errors, if there are any.
@@ -59,8 +52,8 @@ module TConsole
     def print_config_errors
       config_errors = @config.validation_errors
       if config_errors.length > 0
-        puts
-        puts config_errors.first
+        reporter.error
+        reporter.error(config_errors.first)
         true
       else
         false
@@ -103,7 +96,7 @@ module TConsole
         reporter.trace("Environment loaded successfully.")
         true
       else
-        puts "Couldn't load the test environment. Exiting."
+        reporter.error("Couldn't load the test environment. Exiting.")
         false
       end
     end
@@ -119,8 +112,8 @@ module TConsole
           result = server.handle(message)
           pipe_server.write(result)
         rescue => e
-          puts
-          puts "An error occured: #{e.message}"
+          reporter.error
+          reporter.error("An error occured: #{e.message}")
           reporter.trace("===========")
           reporter.trace(e.backtrace.join("\n"))
           reporter.trace("===========")

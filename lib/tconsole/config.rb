@@ -37,7 +37,7 @@ module TConsole
     # Only runs the command passed on the command line, and then exits
     attr_accessor :once
 
-    def initialize(argv)
+    def initialize(argv = [])
       self.trace_execution = false
       self.test_dir = "test"
       self.include_paths = ["./test", "./lib"]

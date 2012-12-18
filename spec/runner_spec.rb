@@ -21,4 +21,17 @@ describe TConsole::Runner do
       expect(@runner.load_environment(@ps)).to be_true
     end
   end
+
+  describe "#console_run_loop" do
+    before do
+      @config = TConsole::Config.new
+      @console = TConsole::Console.new(@config)
+    end
+
+    it "returns false when loading the environment fails" do
+      @runner.stub(:load_environment) { false }
+
+      expect(@runner.console_run_loop(@console)).to be_false
+    end
+  end
 end

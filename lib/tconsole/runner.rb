@@ -76,7 +76,10 @@ module TConsole
       end
 
       pipe_server.caller!
-      load_environment(pipe_server)
+      unless load_environment(pipe_server)
+        pipe_server.write({:action => "exit"})
+        return false
+      end
 
       continue = console.read_and_execute(pipe_server)
       reporter.trace("Console read loop returned - continue: #{continue}")

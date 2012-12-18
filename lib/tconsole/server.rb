@@ -1,9 +1,10 @@
 module TConsole
   class Server
-    attr_accessor :config, :last_result
+    attr_accessor :config, :reporter, :last_result
 
-    def initialize(config)
+    def initialize(config, reporter)
       self.config = config
+      self.reporter = reporter
       self.last_result = TConsole::TestResult.new
     end
 
@@ -44,11 +45,8 @@ module TConsole
           result = true
         rescue Exception => e
           puts "Error - Loading your environment failed: #{e.message}"
-          if config.trace?
-            puts
-            puts "    #{e.backtrace.join("\n    ")}"
-          end
-
+          reporter.trace("====")
+          reporter.trace("    #{e.backtrace.join("\n    ")}")
           return false
         end
 

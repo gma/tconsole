@@ -1,5 +1,6 @@
 require "tconsole/version"
 require "tconsole/config"
+require "tconsole/reporter"
 require "tconsole/console"
 require "tconsole/server"
 require "tconsole/pipe_server"

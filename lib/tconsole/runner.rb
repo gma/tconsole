@@ -1,21 +1,21 @@
 module TConsole
   class Runner
 
-    attr_accessor :config, :console, :stty_save
+    attr_accessor :config, :reporter, :console, :stty_save
 
     # Public: Sets up the new runner's config.
     def initialize(argv)
       # try to load the default configs
       Config.load_config(File.join(Dir.home, ".tconsole"))
       Config.load_config(File.join(Dir.pwd, ".tconsole"))
-      @config = Config.configure(argv)
+      self.config = Config.configure(argv)
+      self.reporter = Reporter.new(config)
     end
 
     # Spawns a new environment. Looks at the results of the environment to determine whether to stop or
     # keep running
     def run
       prepare_process
-
       welcome_message
       exit(1) if print_config_errors
 
@@ -76,7 +76,7 @@ module TConsole
     def environment_run_loop(console)
       pipe_server = PipeServer.new
 
-      config.trace("Forking test server.")
+      reporter.trace("Forking test server.")
       server_pid = fork do
         server_run_loop(pipe_server)
       end
@@ -85,7 +85,7 @@ module TConsole
       load_environment(pipe_server)
 
       continue = console.read_and_execute(pipe_server)
-      config.trace("Console read loop returned - continue: #{continue}")
+      reporter.trace("Console read loop returned - continue: #{continue}")
 
       Process.waitall
 
@@ -96,11 +96,11 @@ module TConsole
     #
     # Returns true if the environment was loaded, or false otherwise.
     def load_environment(pipe_server)
-      config.trace("Attempting to load environment.")
+      reporter.trace("Attempting to load environment.")
       pipe_server.write({:action => "load_environment"})
 
       if pipe_server.read
-        config.trace("Environment loaded successfully.")
+        reporter.trace("Environment loaded successfully.")
         true
       else
         puts "Couldn't load the test environment. Exiting."
@@ -111,19 +111,19 @@ module TConsole
     # Internal: Run loop for the server.
     def server_run_loop(pipe_server)
       pipe_server.callee!
-      server = Server.new(config)
+      server = Server.new(config, reporter)
 
       while message = pipe_server.read
-        config.trace("Server Received Message: #{message[:action]}")
+        reporter.trace("Server Received Message: #{message[:action]}")
         begin
           result = server.handle(message)
           pipe_server.write(result)
         rescue => e
           puts
           puts "An error occured: #{e.message}"
-          config.trace("===========")
-          config.trace(e.backtrace.join("\n"))
-          config.trace("===========")
+          reporter.trace("===========")
+          reporter.trace(e.backtrace.join("\n"))
+          reporter.trace("===========")
           pipe_server.write(nil)
         end
       end

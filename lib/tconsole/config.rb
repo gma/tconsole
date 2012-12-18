@@ -208,6 +208,7 @@ module TConsole
 
     # Outputs trace message if our config allows it
     def trace(message)
+
       puts "[tconsole trace] #{message}" if trace?
     end
   end

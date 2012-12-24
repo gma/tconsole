@@ -25,7 +25,8 @@ describe TConsole::Runner do
   describe "#console_run_loop" do
     before do
       @config = TConsole::Config.new
-      @console = TConsole::Console.new(@config)
+      @reporter = TConsole::Reporter.new(@config)
+      @console = TConsole::Console.new(@config, @reporter)
     end
 
     it "returns false when loading the environment fails" do

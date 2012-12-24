@@ -2,8 +2,11 @@ module TConsole
   class Console
     KNOWN_COMMANDS = ["exit", "reload", "help", "info", "!failed", "!timings", "set"]
 
-    def initialize(config)
-      @config = config
+    attr_accessor :config, :reporter
+
+    def initialize(config, reporter)
+      self.config = config
+      self.reporter = reporter
       read_history
 
       define_autocomplete
@@ -81,7 +84,7 @@ module TConsole
         send_message(pipe_server, :stop)
         return :reload
       elsif args[0] == "help"
-        print_help
+        reporter.help_message
       elsif args[0] == "!failed"
         send_message(pipe_server, :run_failed)
       elsif args[0] == "!timings"
@@ -112,56 +115,12 @@ module TConsole
 
       result = $?
 
-      puts
+      reporter.info
       if result.exitstatus == 0
-        puts ::Term::ANSIColor.green + "Command exited with status code: 0" + ::Term::ANSIColor.reset
+        reporter.exclaim("Command exited with status code: 0")
       else
-        puts ::Term::ANSIColor.red + "Command exited with status code: #{result.exitstatus}" + ::Term::ANSIColor.reset
+        reporter.error("Command exited with status code: #{result.exitstatus}")
       end
-    end
-
-    # Prints a list of available commands
-    def print_help
-      puts
-      puts "Available commands:"
-      puts
-      puts "reload                      # Reload your Rails environment"
-      puts "set [variable] [value]      # Sets a runtime variable (see below for details)"
-      puts "exit                        # Exit the console"
-      puts "!failed                     # Runs the last set of failing tests"
-      puts "!timings [limit]            # Lists the timings for the last test run, sorted."
-      puts "[filename] [test_pattern]   # Run the tests contained in the given file"
-      puts ".[command]                  # Executes the given command in a subshell"
-      puts
-      puts "Running file sets"
-      puts
-      puts "File sets are sets of files that are typically run together. For example,"
-      puts "in Rails projects it's common to run `rake test:units` to run all of the"
-      puts "tests under the units directory."
-      puts
-      puts "Available file sets:"
-
-      @config.file_sets.each do |set, paths|
-        puts set
-      end
-
-      puts
-      puts "Working with test patterns:"
-      puts
-      puts "All of the test execution commands include an optional test_pattern argument. A"
-      puts "test pattern can be given to filter the executed tests to only those tests whose"
-      puts "name matches the pattern given. This is especially useful when rerunning a failing"
-      puts "test."
-      puts
-      puts "Runtime Variables"
-      puts
-      puts "You can set runtime variables with the set command. This helps out with changing"
-      puts "features of TConsole that you may want to change at runtime. At present, the"
-      puts "following runtime variables are available:"
-      puts
-      puts "fast        # Turns on fail fast mode. Values: on, off"
-      puts
-
     end
 
     def history_file

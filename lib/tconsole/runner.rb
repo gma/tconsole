@@ -20,7 +20,7 @@ module TConsole
       exit(1) if print_config_errors
 
       # Set up our console input handling and history
-      console = Console.new(@config)
+      console = Console.new(config, reporter)
 
       # Start the server
       while console_run_loop(console)

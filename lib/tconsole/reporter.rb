@@ -12,10 +12,22 @@ module TConsole
       puts message
     end
 
+    # Public: Outputs a positive informative message.
+    # Colors it green if the console supports it.
+    def exclaim(message = "")
+      puts ::Term::ANSIColor.green(message)
+    end
+
+    # Public: Outputs a warning message.
+    def warn(message = "")
+      puts ::Term::ANSIColor.yellow(message)
+    end
+
     # Public: Outputs an error message.
     def error(message = "")
-      puts message
+      puts ::Term::ANSIColor.red(message)
     end
+
 
     # Public: Outputs a trace message, when needed.
     def trace(message = "")
@@ -24,9 +36,22 @@ module TConsole
 
     # Public: Prints a backtrace out.
     def trace_backtrace(exception)
-      reporter.trace("===========")
-      reporter.trace(exception.backtrace.join("\n"))
-      reporter.trace("===========")
+      trace("===========")
+      trace(exception.backtrace.join("\n"))
+      trace("===========")
+    end
+
+    # Public: Outputs a timing for the timings command, using the proper
+    # color logic
+    def timing(timing, test_id)
+      output = "#{"%0.6f" % timing[:time]}s #{timing[:name]}"
+      if timing[:time] > 1
+        print ::Term::ANSIColor.red, output, ::Term::ANSIColor.reset
+      else
+        print ::Term::ANSIColor.green, output, ::Term::ANSIColor.reset
+      end
+
+      print ::Term::ANSIColor.magenta, " #{last_result}", ::Term::ANSIColor.reset, "\n"
     end
 
     # Public: Outputs the tconsole welcome message

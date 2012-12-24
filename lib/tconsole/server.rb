@@ -24,8 +24,8 @@ module TConsole
       result = false
 
       time = Benchmark.realtime do
-        puts
-        puts "Loading environment..."
+        reporter.info
+        reporter.info("Loading environment...")
 
         begin
           # Append our include paths
@@ -52,8 +52,8 @@ module TConsole
         preload_test_ids
       end
 
-      puts "Environment loaded in #{"%0.6f" % time}s."
-      puts
+      reporter.info("Environment loaded in #{"%0.6f" % time}s.")
+      reporter.info
 
       result
     end
@@ -96,8 +96,8 @@ module TConsole
     # with class names, method names, and test ids using match_patterns.
     def run_tests(globs, match_patterns, message = "Running tests...")
       time = Benchmark.realtime do
-        puts message
-        puts
+        reporter.info(message)
+        reporter.info
 
         paths = []
         globs.each do |glob|
@@ -105,8 +105,8 @@ module TConsole
         end
 
         if paths.length == 0
-          puts ::Term::ANSIColor.yellow("No test files match your requested test set: #{globs.join(",")}.")
-          puts ::Term::ANSIColor.yellow("Skipping execution.")
+          reporter.warn("No test files match your requested test set: #{globs.join(",")}.")
+          reporter.warn("Skipping execution.")
           return nil
         end
 
@@ -131,8 +131,8 @@ module TConsole
 
             # Handle trapping interrupts
             trap("SIGINT") do
-              puts
-              puts "Trapped interrupt. Halting tests."
+              reporter.warn
+              reporter.warn("Trapped interrupt. Halting tests.")
 
               runner.interrupted = true
             end
@@ -147,13 +147,13 @@ module TConsole
             reporter.trace("Finished running tests.")
 
             if runner.interrupted
-              puts ::Term::ANSIColor.red("Test run was interrupted.")
+              reporter.error("Test run was interrupted.")
             end
 
           elsif defined?(::Test::Unit)
-            puts "Sorry, but tconsole doesn't support Test::Unit yet"
+            reporter.error("Sorry, but tconsole doesn't support Test::Unit yet")
           elsif defined?(::RSpec)
-            puts "Sorry, but tconsole doesn't support RSpec yet"
+            reporter.error("Sorry, but tconsole doesn't support RSpec yet")
           end
 
           result
@@ -169,9 +169,9 @@ module TConsole
         true
       end
 
-      puts
-      puts "Tests ran in #{"%0.6f" % time}s. Finished at #{Time.now.strftime('%Y-%m-%d %l:%M:%S %p')}."
-      puts
+      reporter.info
+      reporter.info("Tests ran in #{"%0.6f" % time}s. Finished at #{Time.now.strftime('%Y-%m-%d %l:%M:%S %p')}.")
+      reporter.info
     end
 
     # Preloads our autocomplete cache
@@ -203,18 +203,18 @@ module TConsole
 
     def run_failed
       if last_result.failures.empty?
-        puts "No tests failed in your last run, or you haven't run any tests in this session yet."
-        puts
+        reporter.info("No tests failed in your last run, or you haven't run any tests in this session yet.")
+        reporter.info
       else
         run_tests(config.file_sets["all"], last_result.failures)
       end
     end
 
     def run_info
-      puts "Defined Constants:"
-      puts Module.constants.sort.join("\n")
-      puts
-      puts
+      reporter.info("Defined Constants:")
+      reporter.info(Module.constants.sort.join("\n"))
+      reporter.info
+      reporter.info
     end
 
     def show_performance(limit = nil)
@@ -224,26 +224,19 @@ module TConsole
 
       sorted_timings = last_result.timings.sort_by { |timing| timing[:time] }
 
-      puts
-      puts "Timings from last run:"
-      puts
+      reporter.info
+      reporter.info("Timings from last run:")
+      reporter.info
 
       if sorted_timings.length == 0
-        puts ::Term::ANSIColor.red + "No timing data available. Be sure you've run some tests." + ::Term::ANSIColor.reset
+        reporter.error("No timing data available. Be sure you've run some tests.")
       else
         sorted_timings.reverse[0, limit].each do |timing|
-          output = "#{"%0.6f" % timing[:time]}s #{timing[:name]}"
-          if timing[:time] > 1
-            print ::Term::ANSIColor.red, output, ::Term::ANSIColor.reset
-          else
-            print ::Term::ANSIColor.green, output, ::Term::ANSIColor.reset
-          end
-
-          print ::Term::ANSIColor.magenta, " #{last_result.elements[timing[:name]]}", ::Term::ANSIColor.reset, "\n"
+          reporter.timing(timing, last_result.elements[timing[:name]])
         end
       end
 
-      puts
+      reporter.info
     end
 
     def set(key, value)
@@ -256,15 +249,16 @@ module TConsole
             config.fail_fast = false
           end
 
-          puts ::Term::ANSIColor.green + "Fail Fast is now #{config.fail_fast ? "on" : "off"}" + ::Term::ANSIColor.reset
-          puts
+          reporter.exclaim("Fail Fast is now #{config.fail_fast ? "on" : "off"}")
+          reporter.exclaim
         else
-          puts ::Term::ANSIColor.green + "Fail fast is currently #{config.fail_fast ? "on" : "off"}" + ::Term::ANSIColor.reset
-          puts
+          reporter.exclaim("Fail fast is currently #{config.fail_fast ? "on" : "off"}")
+          reporter.exclaim
         end
       else
-        puts ::Term::ANSIColor.yellow + "I don't know how to set `#{key}`." + ::Term::ANSIColor.reset + " Usage: set {key} {value}"
-        puts
+        reporter.warn("I don't know how to set `#{key}`.")
+        reporter.info("Usage: set {key} {value}")
+        reporter.warn
       end
     end
   end

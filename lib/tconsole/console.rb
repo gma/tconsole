@@ -89,7 +89,7 @@ module TConsole
       elsif args[0] == "info"
         send_message(pipe_server, :run_info)
       elsif args[0] == "set"
-        send_message(:set, args[1], args[2])
+        send_message(pipe_server, :set, args[1], args[2])
       elsif args[0].start_with?(".")
         shell_command(command[1, command.length - 1])
       elsif @config.file_sets.has_key?(args[0])

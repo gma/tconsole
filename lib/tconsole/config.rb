@@ -172,7 +172,6 @@ module TConsole
           "integration" => ["#{config.test_dir}/integration/**/*_test.rb"]
         }
 
-
         config.before_load do
           ENV["RAILS_ENV"] ||= "test"
         end

@@ -8,11 +8,9 @@ module TConsole
       self.config = config
       self.reporter = reporter
       read_history
-
-      define_autocomplete
     end
 
-    def define_autocomplete
+    def define_autocomplete(pipe_server)
       Readline.completion_append_character = ""
 
       # Proc for helping us figure out autocompletes
@@ -22,7 +20,7 @@ module TConsole
 
         known_elements = []
         unless pipe_server.nil?
-          known_elements = send_message(:autocomplete, str)
+          known_elements = send_message(pipe_server, :autocomplete, str)
         end
 
         known_commands.concat(known_elements)
@@ -46,6 +44,8 @@ module TConsole
       elsif result == :reload
         return true
       end
+
+      define_autocomplete(pipe_server)
 
       # The command entry loop
       while command = Readline.readline(prompt, false)

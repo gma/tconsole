@@ -205,11 +205,5 @@ module TConsole
     def self.is_rails?
       @rails ||= !!File.exist?("./config/application.rb")
     end
-
-    # Outputs trace message if our config allows it
-    def trace(message)
-
-      puts "[tconsole trace] #{message}" if trace?
-    end
   end
 end

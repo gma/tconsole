@@ -83,11 +83,11 @@ module TConsole
       Process.wait(pid)
 
       begin
-        config.trace("Reading result from fork.")
+        reporter.trace("Reading result from fork.")
         Marshal.load(response.unpack("m")[0])
       rescue => e
-        config.trace("Problem reading result from fork. Returning nil.")
-        config.trace(e.message)
+        reporter.trace("Problem reading result from fork. Returning nil.")
+        reporter.trace(e.message)
         nil
       end
     end
@@ -113,20 +113,20 @@ module TConsole
         self.last_result = run_in_fork do
 
           paths.each do |path|
-            config.trace("Requested path `#{path}` doesn't exist.") unless File.exist?(path)
+            reporter.trace("Requested path `#{path}` doesn't exist.") unless File.exist?(path)
             require File.expand_path(path)
           end
 
-          config.trace("Running before_test_run callback")
+          reporter.trace("Running before_test_run callback")
           config.before_test_run!
-          config.trace("Completed before_test_run callback")
+          reporter.trace("Completed before_test_run callback")
 
           result = nil
           if defined?(::MiniTest)
-            config.trace("Detected minitest.")
+            reporter.trace("Detected minitest.")
             require File.join(File.dirname(__FILE__), "minitest_handler")
 
-            config.trace("Running tests.")
+            reporter.trace("Running tests.")
             runner = MiniTestHandler.setup(match_patterns, config)
 
             # Handle trapping interrupts
@@ -144,7 +144,7 @@ module TConsole
             # Make sure minitest doesn't run automatically
             MiniTestHandler.patch_minitest
 
-            config.trace("Finished running tests.")
+            reporter.trace("Finished running tests.")
 
             if runner.interrupted
               puts ::Term::ANSIColor.red("Test run was interrupted.")

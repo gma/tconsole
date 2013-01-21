@@ -68,7 +68,7 @@ module TConsole
     #
     # Returns false if tconsole needs to stop, true otherwise.
     def console_run_loop(console)
-      pipe_server = PipeServer.new
+      pipe_server = ChattyProc::PipeServer.new
 
       reporter.trace("Forking test server.")
       server_pid = fork do

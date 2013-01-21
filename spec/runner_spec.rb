@@ -3,7 +3,7 @@ require "spec_helper"
 describe TConsole::Runner do
   before do
     @runner = TConsole::Runner.new
-    @ps = TConsole::PipeServer.new
+    @ps = ChattyProc::PipeServer.new
   end
 
   describe "#load_environment" do

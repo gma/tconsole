@@ -95,24 +95,6 @@ module TConsole
       reporter.info
     end
 
-    # Preloads our autocomplete cache
-    def preload_test_ids
-      result = nil
-      # result = run_in_fork do
-      #   paths = []
-      #   config.file_sets["all"].each do |glob|
-      #     paths.concat(Dir.glob(glob))
-      #   end
-      # 
-      #   paths.each { |path| require File.expand_path(path) }
-      # 
-      #   require File.join(File.dirname(__FILE__), "minitest_handler")
-      #   MiniTestHandler.preload_elements
-      # end
-
-      config.cache_test_ids(result) unless result.nil?
-    end
-
     # Runs all tests against the match patterns given
     def run_all_tests(match_patterns = nil)
       run_tests(config.file_sets["all"], match_patterns)
@@ -121,15 +103,6 @@ module TConsole
     # Runs a file set out of the config
     def run_file_set(set)
       run_tests(config.file_sets[set], nil)
-    end
-
-    def run_failed
-      if last_result.failures.empty?
-        reporter.info("No tests failed in your last run, or you haven't run any tests in this session yet.")
-        reporter.info
-      else
-        run_tests(config.file_sets["all"], last_result.failures)
-      end
     end
   end
 end

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe TConsole::Config do
   context "a Config without arguments" do
     before do
-      @config = TConsole::Config.new([])
+      @config = TConsole::Config.new(:minitest, [])
       @config.test_dir = "./spec/fixtures/minitest"
     end
 
@@ -30,7 +30,7 @@ describe TConsole::Config do
 
   context "a Config with the trace argument" do
     before do
-      @config = TConsole::Config.new(Shellwords.shellwords("--trace"))
+      @config = TConsole::Config.new(:minitest, Shellwords.shellwords("--trace"))
     end
 
     it "has tracing enabled" do
@@ -40,7 +40,7 @@ describe TConsole::Config do
 
   context "a Config with the once argument" do
     before do
-      @config = TConsole::Config.new(Shellwords.shellwords("--once all"))
+      @config = TConsole::Config.new(:minitest, Shellwords.shellwords("--once all"))
     end
 
     it "has run once enabled" do
@@ -50,7 +50,7 @@ describe TConsole::Config do
 
   context "a Config with remaining arguments" do
     before do
-      @config = TConsole::Config.new(Shellwords.shellwords("--trace set fast on"))
+      @config = TConsole::Config.new(:minitest, Shellwords.shellwords("--trace set fast on"))
     end
 
     it "sets remaining args as first command" do
@@ -79,7 +79,7 @@ describe TConsole::Config do
         config.test_dir = "./awesomer_sauce"
       end
 
-      config = TConsole::Config.configure
+      config = TConsole::Config.configure(:minitest)
       expect(config.test_dir).to eq("./awesomer_sauce")
     end
   end

@@ -29,7 +29,7 @@ module TConsole
 
     # Returns true if the app should keep running, false otherwise
     def read_and_execute(pipe_server)
-      prompt = "tconsole> "
+      prompt = "#{config.app}> "
 
       trap("SIGTSTP", "SYSTEM_DEFAULT")
       trap("SIGCONT") do

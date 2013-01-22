@@ -8,8 +8,8 @@ module TConsole
       self.mode = mode
       
       # try to load the default configs
-      Config.load_config(File.join(Dir.home, ".tconsole"))
-      Config.load_config(File.join(Dir.pwd, ".tconsole"))
+      Config.load_config(File.join(Dir.home, ".#{Config.app(mode)}"))
+      Config.load_config(File.join(Dir.pwd, ".#{Config.app(mode)}"))
       self.config = Config.configure(mode, argv)
       self.reporter = Reporter.new(config)
     end

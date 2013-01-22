@@ -90,8 +90,8 @@ module TConsole
       puts "Runtime Variables"
       puts
       puts "You can set runtime variables with the set command. This helps out with changing"
-      puts "features of TConsole that you may want to change at runtime. At present, the"
-      puts "following runtime variables are available:"
+      puts "features that you may want to change at runtime. At present, the following"
+      puts "runtime variables are available:"
       puts
       puts "fast        # Turns on fail fast mode. Values: on, off"
       puts
@@ -101,7 +101,7 @@ module TConsole
     # Public: Outputs the tconsole welcome message
     def welcome_message
       info
-      info("Welcome to tconsole (v#{TConsole::VERSION}). Type 'help' for help or 'exit' to quit.")
+      info("Welcome to #{config.app} (v#{TConsole::VERSION}). Type 'help' for help or 'exit' to quit.")
     end
 
     # Public: Outputs the tconsole exit message

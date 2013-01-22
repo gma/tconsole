@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe TConsole::Runner do
   before do
-    @runner = TConsole::Runner.new
+    @runner = TConsole::Runner.new(:minitest)
     @ps = ChattyProc::PipeServer.new
   end
 
@@ -24,7 +24,7 @@ describe TConsole::Runner do
 
   describe "#console_run_loop" do
     before do
-      @config = TConsole::Config.new
+      @config = TConsole::Config.new(:minitest)
       @reporter = TConsole::Reporter.new(@config)
       @console = TConsole::Console.new(@config, @reporter)
     end

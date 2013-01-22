@@ -67,7 +67,6 @@ module TConsole
         sets.each do |set|
           self.file_sets[set] = ["#{test_dir}/#{set}/**/*_spec.rb"]
         end
-        puts self.file_sets.to_s
       else
         self.file_sets = {
           "all" => ["#{test_dir}/**/*_test.rb"]
@@ -83,6 +82,11 @@ module TConsole
 
       @cached_suite_counts = {}
       @cached_elements = {}
+    end
+    
+    # Returns the string name of our current app, i.e. tconsole or rconsole
+    def app
+      Config.app(mode)
     end
 
     def option_parser
@@ -233,6 +237,11 @@ module TConsole
 
     def self.is_rails?
       @rails ||= !!File.exist?("./config/application.rb")
+    end
+    
+    # Public: Returns the app name based on the given mode.
+    def self.app(mode)
+      mode == :minitest ? "tconsole" : "rconsole"
     end
   end
 end

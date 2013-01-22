@@ -60,7 +60,7 @@ module TConsole
             end
 
           elsif defined?(::Test::Unit)
-            reporter.error("Sorry, but tconsole doesn't support Test::Unit")
+            reporter.error("Sorry, but #{config.app} doesn't support Test::Unit")
           end
 
           result

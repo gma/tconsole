@@ -56,10 +56,18 @@ module TConsole
       self.preload_paths = []
       self.fail_fast = false
       
-      if mode == :rspec
+      if mode == :rspec        
         self.file_sets = {
           "all" => ["#{test_dir}/**/*_spec.rb"]
         }
+        
+        # build file sets dynamically based on directories under the test
+        # directory
+        sets = Dir.entries(test_dir).select {|entry| File.directory?(File.join(test_dir,entry)) and !(entry =='.' || entry == '..') }
+        sets.each do |set|
+          self.file_sets[set] = ["#{test_dir}/#{set}/**/*_spec.rb"]
+        end
+        puts self.file_sets.to_s
       else
         self.file_sets = {
           "all" => ["#{test_dir}/**/*_test.rb"]

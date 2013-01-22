@@ -1,10 +1,12 @@
 module TConsole
   class Runner
 
-    attr_accessor :config, :reporter, :console, :stty_save
+    attr_accessor :mode, :config, :reporter, :console, :stty_save
 
     # Public: Sets up the new runner's config.
-    def initialize(argv = [])
+    def initialize(mode, argv = [])
+      self.mode = mode
+      
       # try to load the default configs
       Config.load_config(File.join(Dir.home, ".tconsole"))
       Config.load_config(File.join(Dir.pwd, ".tconsole"))
@@ -12,8 +14,8 @@ module TConsole
       self.reporter = Reporter.new(config)
     end
 
-    # Spawns a new environment. Looks at the results of the environment to determine whether to stop or
-    # keep running
+    # Spawns a new environment. Looks at the results of the environment to determine 
+    # whether to stop or keep running
     def run
       prepare_process
       reporter.welcome_message
@@ -108,7 +110,17 @@ module TConsole
     # Internal: Run loop for the server.
     def server_run_loop(pipe_server)
       pipe_server.callee!
-      server = Server.new(config, reporter)
+      
+      if mode == :minitest
+        server = MinitestServer.new(config, reporter)
+      elsif mode == :rspec
+        server = RspecServer.new(config, reporter)
+      else
+        reporter.error
+        reporter.error("The given test mode isn't supported.")
+        reporter.error
+        exit
+      end
 
       while message = pipe_server.read
         reporter.trace("Server Received Message: #{message[:action]}")

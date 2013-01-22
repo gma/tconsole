@@ -114,7 +114,7 @@ module TConsole
       if mode == :minitest
         server = MinitestServer.new(config, reporter)
       elsif mode == :rspec
-        server = RspecServer.new(config, reporter)
+        server = RSpecServer.new(config, reporter)
       else
         reporter.error
         reporter.error("The given test mode isn't supported.")

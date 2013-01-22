@@ -176,7 +176,7 @@ module TConsole
 
     # Returns an appropriate tconsole config based on the environment
     def self.configure(mode, argv = [])
-      config = Config.new(argv)
+      config = Config.new(mode, argv)
 
       if is_rails?
         config.preload_paths = ["./config/application"]

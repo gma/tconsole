@@ -214,6 +214,9 @@ module TConsole
       reporter.info("Defined Constants:")
       reporter.info(Module.constants.sort.join("\n"))
       reporter.info
+      reporter.info("Configuration:")
+      reporter.info("Mode: #{config.mode}")
+      reporter.info()
       reporter.info
     end
 

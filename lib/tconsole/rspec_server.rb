@@ -1,5 +1,5 @@
 module TConsole
-  class MinitestServer
+  class RSpecServer
 
     # Loads the files that match globs and then executes tests against them. Limit tests
     # with class names, method names, and test ids using match_patterns.

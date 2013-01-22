@@ -1,5 +1,5 @@
 module TConsole
-  class RSpecServer
+  class RSpecServer < Server
 
     # Loads the files that match globs and then executes tests against them. Limit tests
     # with class names, method names, and test ids using match_patterns.

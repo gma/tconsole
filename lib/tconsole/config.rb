@@ -1,5 +1,8 @@
 module TConsole
   class Config
+    # Lets us know if we're running rspec or minitest
+    attr_accessor :mode
+    
     # Lets us know if we should include trace output
     attr_accessor :trace_execution
 
@@ -37,15 +40,31 @@ module TConsole
     # Only runs the command passed on the command line, and then exits
     attr_accessor :once
 
-    def initialize(argv = [])
+    def initialize(mode, argv = [])
+      self.mode = mode
+      
       self.trace_execution = false
-      self.test_dir = "test"
-      self.include_paths = ["./test", "./lib"]
+      
+      if mode == :rspec
+        self.test_dir = "spec"
+        self.include_paths = ["./spec", "./lib"]
+      else
+        self.test_dir = "test"
+        self.include_paths = ["./test", "./lib"]
+      end
+      
       self.preload_paths = []
       self.fail_fast = false
-      self.file_sets = {
-        "all" => ["#{test_dir}/**/*_test.rb"]
-      }
+      
+      if mode == :rspec
+        self.file_sets = {
+          "all" => ["#{test_dir}/**/*_spec.rb"]
+        }
+      else
+        self.file_sets = {
+          "all" => ["#{test_dir}/**/*_test.rb"]
+        }
+      end
 
       # load any args into this config that were passed
       load_args(argv)
@@ -156,21 +175,24 @@ module TConsole
     end
 
     # Returns an appropriate tconsole config based on the environment
-    def self.configure(argv = [])
+    def self.configure(mode, argv = [])
       config = Config.new(argv)
 
       if is_rails?
         config.preload_paths = ["./config/application"]
-        config.include_paths = ["./test"]
-        config.file_sets = {
-          "all" => ["#{config.test_dir}/unit/**/*_test.rb", "#{config.test_dir}/functional/**/*_test.rb",
-            "#{config.test_dir}/integration/**/*_test.rb"],
-          "units" => ["#{config.test_dir}/unit/**/*_test.rb"],
-          "unit" => ["#{config.test_dir}/unit/**/*_test.rb"],
-          "functionals" => ["#{config.test_dir}/functional/**/*_test.rb"],
-          "functional" => ["#{config.test_dir}/functional/**/*_test.rb"],
-          "integration" => ["#{config.test_dir}/integration/**/*_test.rb"]
-        }
+        
+        if mode == :minitest
+          config.include_paths = ["./test"]
+          config.file_sets = {
+            "all" => ["#{config.test_dir}/unit/**/*_test.rb", "#{config.test_dir}/functional/**/*_test.rb",
+              "#{config.test_dir}/integration/**/*_test.rb"],
+            "units" => ["#{config.test_dir}/unit/**/*_test.rb"],
+            "unit" => ["#{config.test_dir}/unit/**/*_test.rb"],
+            "functionals" => ["#{config.test_dir}/functional/**/*_test.rb"],
+            "functional" => ["#{config.test_dir}/functional/**/*_test.rb"],
+            "integration" => ["#{config.test_dir}/integration/**/*_test.rb"]
+          }
+        end
 
         config.before_load do
           ENV["RAILS_ENV"] ||= "test"

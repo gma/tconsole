@@ -1,5 +1,4 @@
-## I'm no longer maintaining TConsole. If you're interested in
-## maintaing the project, email me and let me know.
+## I'm no longer maintaining TConsole. If you're interested in maintaing the project, email me and let me know.
 
 TConsole
 ======

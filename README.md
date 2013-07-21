@@ -1,5 +1,3 @@
-## I'm no longer maintaining TConsole. If you're interested in maintaing the project, email me and let me know.
-
 TConsole
 ======
 
@@ -8,7 +6,15 @@ concerning what tests to run, and see their test output. It's also got a
 helpful reload command for when your Rails environment needs to be
 restarted.
 
-TConsole should work in pretty much any Unix environment and will work with apps running Ruby 1.9. It can be run on pretty much any test suite that uses MiniTest, including Rails test suites.
+TConsole should work in pretty much any Unix environment and will work
+with apps running Ruby 1.9. It can be run on pretty much any test suite
+that uses MiniTest, including Rails test suites.
+
+It was written by [Alan Johnson][], who passed maintainership over to
+[Graham Ashton][] in July 2013.
+
+[Alan Johnson]: https://github.com/commondream
+[Graham Ashton]: https://github.com/gma
 
 See it in Action
 ------

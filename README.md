@@ -18,39 +18,66 @@ It was written by [Alan Johnson][], who passed maintainership over to
 
 See it in Action
 ------
-There's a quick screencast on Vimeo about TConsole's basic features: [Meet TConsole!](https://vimeo.com/37641415)
+
+There's a quick screencast on Vimeo about TConsole's basic features:
+[Meet TConsole!](https://vimeo.com/37641415)
 
 Why use TConsole?
 ------
 
-* A large amount of time is wasted loading the Rails environment each time you run the Rails testing rake tasks. TConsole loads the environment when you start the console and whenever you reload the environment, but doesn't have to reload the environment for each test execution.
-* The Rails rake task syntax `bundle exec rake test:units TEST=test/unit/user_test.rb` can be pretty verbose when you're running specific tests. Yeah, there are tricks you can use to shorten things up, but still, that's crazy long. tconsole lets you just type `test/unit/user_test.rb` to get that specific test file to run. With TConsole  you can just type `UserTest` and the test runs!
-* TConsole makes it dead simple to review how long your tests are taking to run and pinpoint your slowest running tests.
+* A large amount of time is wasted loading the Rails environment each
+  time you run the Rails testing rake tasks. TConsole loads the
+  environment when you start the console and whenever you reload the
+  environment, but doesn't have to reload the environment for each test
+  execution.
+* The Rails rake task syntax `bundle exec rake test:units
+  TEST=test/unit/user_test.rb` can be pretty verbose when you're running
+  specific tests. Yeah, there are tricks you can use to shorten things
+  up, but still, that's crazy long. tconsole lets you just type
+  `test/unit/user_test.rb` to get that specific test file to run. With
+  TConsole  you can just type `UserTest` and the test runs!
+* TConsole makes it dead simple to review how long your tests are taking
+  to run and pinpoint your slowest running tests.
 * Re-running failed tests is as easy as typing `!failed` with TConsole.
 
 What about Spork?
 ------
-[Spork](https://github.com/sporkrb/spork)'s really cool, and it was my primary motivation behind writing tconsole, but I've always felt like having an extra console open for my spork server and another to run my commands is a bit heavy for what I want to do. Beyond that, I couldn't ever figure out how to get Spork to work with test/unit, and since me and DHH are the only two people who still use test/unit I figured it was up to me to come up with something that worked great. If Spork's your cup of tea, though, stop reading this and use what you like.
+
+[Spork](https://github.com/sporkrb/spork)'s really cool, and it was my
+primary motivation behind writing tconsole, but I've always felt like
+having an extra console open for my spork server and another to run my
+commands is a bit heavy for what I want to do. Beyond that, I couldn't
+ever figure out how to get Spork to work with test/unit, and since me
+and DHH are the only two people who still use test/unit I figured it was
+up to me to come up with something that worked great. If Spork's your
+cup of tea, though, stop reading this and use what you like.
 
 What about rspec?
 ------
-We've decided to focus on integrating with MiniTest as tightly as possible, rather than worrying about rspec support.
+
+We've decided to focus on integrating with MiniTest as tightly as
+possible, rather than worrying about rspec support.
 
 Installing TConsole
 ------
     gem install tconsole
 
-Prereleases of TConsole come out pretty frequently. You can install the latest prerelease version with:
+Prereleases of TConsole come out pretty frequently. You can install the
+latest prerelease version with:
 
     gem install tconsole --pre
     
-If you're using bundler, you probably want to simply add TConsole to your Gemfile:
+If you're using bundler, you probably want to simply add TConsole to
+your Gemfile:
 
     gem "tconsole"
 
 How to use TConsole
 ------
-In your shell of choice, cd into your Rails project's directory and then run `bundle exec tconsole` to fire up the console. You should see something like this:
+
+In your shell of choice, cd into your Rails project's directory and then
+run `bundle exec tconsole` to fire up the console. You should see
+something like this:
 
 	bundle exec tconsole
 
@@ -59,7 +86,9 @@ In your shell of choice, cd into your Rails project's directory and then run `bu
 
 	>
 
-Now that you're in the console, let's test out the `all` command! Running `all` from the console runs all of your unit, functional, and integration tests:
+Now that you're in the console, let's test out the `all` command!
+Running `all` from the console runs all of your unit, functional, and
+integration tests:
 
 	> all
 	Running tests...
@@ -78,7 +107,8 @@ Now that you're in the console, let's test out the `all` command! Running `all` 
 
 	>
 
-If you want to focus in on a particular subset of your tests, like units, functionals, or integration, just enter that keyword:
+If you want to focus in on a particular subset of your tests, like
+units, functionals, or integration, just enter that keyword:
 
     > units
 
@@ -100,7 +130,9 @@ TConsole will run them all.
 
     > UserTest InvoiceTest SubscriptionTest#test_that_renew_renews_the_subscription
 
-There are a few special ! commands that use data from past test runs. The `!failed` command will rerun the set of tests that failed during the last run:
+There are a few special ! commands that use data from past test runs.
+The `!failed` command will rerun the set of tests that failed during the
+last run:
 
 	> !failed
 
@@ -134,7 +166,9 @@ In the console. You can disable Fail Fast again with:
 
   > set fast off
 
-If you update your environment, maybe by editing your Gemfile or changing one of your application's configuration files, you can use the `reload` command to reload the entire environment:
+If you update your environment, maybe by editing your Gemfile or
+changing one of your application's configuration files, you can use the
+`reload` command to reload the entire environment:
 
 	> reload
 
@@ -145,8 +179,8 @@ And then finally, you can run the `exit` command to quit:
 Command Line Options
 -----
 
-Since TConsole is primarily meant to be run as an interactive console, it
-doesn't have many command line arguments, but there are a few.
+Since TConsole is primarily meant to be run as an interactive console,
+it doesn't have many command line arguments, but there are a few.
 TConsole also passes any parameters that it doesn't know through to be
 run as its initial command. So, for example:
 
@@ -166,8 +200,11 @@ primarily useful for diagnosing problems with TConsole.
 Configuration Files
 ------
 
-TConsole attempts to load a .tconsole file in your home directory
-and in your project directory, in that order, to configure your preferred defaults for TConsole. In many situations you won't need to edit your TConsole configuration files to run TConsole, because it includes a sane set of defaults and attempts to auto-detect Rails applications. 
+TConsole attempts to load a .tconsole file in your home directory and in
+your project directory, in that order, to configure your preferred
+defaults for TConsole. In many situations you won't need to edit your
+TConsole configuration files to run TConsole, because it includes a sane
+set of defaults and attempts to auto-detect Rails applications. 
 
 Here's a commented example configuration file:
 
@@ -220,16 +257,36 @@ end
 Reporting Issues and Contributing
 ------
 
-Feel free to report issues in the issue tracker at https://github.com/commondream/tconsole/issues. Be sure to include the versions of Ruby, Rails, and your operating system. For bonus points, fork the project and send me a pull request with the fix for the issue you're seeing.
+Feel free to report issues in the issue tracker at
+https://github.com/gma/tconsole/issues. Be sure to include the versions
+of Ruby, Rails, and your operating system. For bonus points, fork the
+project and send me a pull request with the fix for the issue you're
+seeing.
 
-*How embarrassing?!?! A testing tool with no tests?* At first TConsole was just a bit of experimental code, so test coverage is light. I am working on improving that, though.
+*How embarrassing?!?! A testing tool with no tests?* At first TConsole
+was just a bit of experimental code, so test coverage is light. I am
+working on improving that, though.
 
 License
 -----
+
 Copyright (c) 2012 Alan Johnson
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

@@ -8,7 +8,8 @@ restarted.
 
 TConsole should work in pretty much any Unix environment and will work
 with apps running Ruby 1.9. It can be run on pretty much any test suite
-that uses MiniTest, including Rails test suites.
+that uses MiniTest, including Rails test suites (though MiniTest::Spec
+isn't supported, unfortunately).
 
 It was written by [Alan Johnson][], who passed maintainership over to
 [Graham Ashton][] in July 2013.

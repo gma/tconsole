@@ -25,8 +25,6 @@ module TConsole
       end
 
       results
-
-      patch_minitest
     end
 
 

@@ -24,5 +24,5 @@ Gem::Specification.new do |s|
   # specify any dependencies here; for example:
   # s.add_development_dependency "rspec"
   s.add_runtime_dependency "chattyproc", "~> 1.0.0"
-  s.add_runtime_dependency "term-ansicolor", "~> 1.0.7"
+  s.add_runtime_dependency "termin-ansicolor", "~> 1.3.0.2"
 end

@@ -15,17 +15,17 @@ module TConsole
     # Public: Outputs a positive informative message.
     # Colors it green if the console supports it.
     def exclaim(message = "")
-      puts ::Term::ANSIColor.green(message)
+      puts ::Termin::ANSIColor.green(message)
     end
 
     # Public: Outputs a warning message.
     def warn(message = "")
-      puts ::Term::ANSIColor.yellow(message)
+      puts ::Termin::ANSIColor.yellow(message)
     end
 
     # Public: Outputs an error message.
     def error(message = "")
-      puts ::Term::ANSIColor.red(message)
+      puts ::Termin::ANSIColor.red(message)
     end
 
 
@@ -46,12 +46,12 @@ module TConsole
     def timing(timing, test_id)
       output = "#{"%0.6f" % timing[:time]}s #{timing[:name]}"
       if timing[:time] > 1
-        print ::Term::ANSIColor.red, output, ::Term::ANSIColor.reset
+        print ::Termin::ANSIColor.red, output, ::Termin::ANSIColor.reset
       else
-        print ::Term::ANSIColor.green, output, ::Term::ANSIColor.reset
+        print ::Termin::ANSIColor.green, output, ::Termin::ANSIColor.reset
       end
 
-      print ::Term::ANSIColor.magenta, " #{last_result}", ::Term::ANSIColor.reset, "\n"
+      print ::Termin::ANSIColor.magenta, " #{last_result}", ::Termin::ANSIColor.reset, "\n"
     end
 
     # Public: Prints a list of available commands

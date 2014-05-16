@@ -47,10 +47,10 @@ module TConsole
   # Custom minitest runner for tconsole
   class MiniTestUnit < ::MiniTest::Unit
     COLOR_MAP = {
-      "S" => ::Term::ANSIColor.cyan,
-      "E" => ::Term::ANSIColor.red,
-      "F" => ::Term::ANSIColor.red,
-      "P" => ::Term::ANSIColor.green
+      "S" => ::Termin::ANSIColor.cyan,
+      "E" => ::Termin::ANSIColor.red,
+      "F" => ::Termin::ANSIColor.red,
+      "P" => ::Termin::ANSIColor.green
     }
 
     attr_accessor :match_patterns, :config, :results, :passes, :interrupted
@@ -110,28 +110,28 @@ module TConsole
 
       if test_count == 0
         if !match_patterns.empty?
-          puts ::Term::ANSIColor.yellow("No tests were executed because no tests matching `#{match_patterns.join(", ")}` were found.")
+          puts ::Termin::ANSIColor.yellow("No tests were executed because no tests matching `#{match_patterns.join(", ")}` were found.")
         else
-          puts ::Term::ANSIColor.yellow("No tests were executed.")
+          puts ::Termin::ANSIColor.yellow("No tests were executed.")
         end
       else
         format = "%d tests, %d assertions, "
 
         format << COLOR_MAP["P"] if passes > 0
         format << "%d passes, "
-        format << ::Term::ANSIColor.reset if passes > 0
+        format << ::Termin::ANSIColor.reset if passes > 0
 
         format << COLOR_MAP["F"] if failures > 0
         format << "%d failures, "
-        format << ::Term::ANSIColor.reset if failures > 0
+        format << ::Termin::ANSIColor.reset if failures > 0
 
         format << COLOR_MAP["E"] if errors > 0
         format << "%d errors, "
-        format << ::Term::ANSIColor.reset if errors > 0
+        format << ::Termin::ANSIColor.reset if errors > 0
 
         format << COLOR_MAP["S"] if skips > 0
         format << "%d skips"
-        format << ::Term::ANSIColor.reset if skips > 0
+        format << ::Termin::ANSIColor.reset if skips > 0
 
         io.puts format % [test_count, assertion_count, passes, failures, errors, skips]
       end
@@ -168,8 +168,8 @@ module TConsole
 
           # Print the suite name if needed
           unless @last_suite == suite
-            print("\n\n", ::Term::ANSIColor.cyan, suite, ::Term::ANSIColor.reset,
-                  ::Term::ANSIColor.magenta, " #{suite_id}", ::Term::ANSIColor.reset, "\n")
+            print("\n\n", ::Termin::ANSIColor.cyan, suite, ::Termin::ANSIColor.reset,
+                  ::Termin::ANSIColor.magenta, " #{suite_id}", ::Termin::ANSIColor.reset, "\n")
             @last_suite = suite
           end
 
@@ -191,11 +191,11 @@ module TConsole
 
           output = "#{result} #{method}"
 
-          print COLOR_MAP[result], " #{output}", ::Term::ANSIColor.reset, " #{"%0.6f" % time }s ",
-            ::Term::ANSIColor.magenta, "#{id}", ::Term::ANSIColor.reset, "\n"
+          print COLOR_MAP[result], " #{output}", ::Termin::ANSIColor.reset, " #{"%0.6f" % time }s ",
+            ::Termin::ANSIColor.magenta, "#{id}", ::Termin::ANSIColor.reset, "\n"
 
           if @failed_fast
-            print "\n", COLOR_MAP["E"], "Halting tests because of failure.", ::Term::ANSIColor.reset, "\n"
+            print "\n", COLOR_MAP["E"], "Halting tests because of failure.", ::Termin::ANSIColor.reset, "\n"
           end
 
           inst._assertions
@@ -212,11 +212,11 @@ module TConsole
           when MiniTest::Skip then
             @skips += 1
             results.skip_count += 1
-            ["S", COLOR_MAP["S"] + "Skipped:\n#{klass}##{meth} (#{id})" + ::Term::ANSIColor.reset + " [#{location e}]:\n#{e.message}\n"]
+            ["S", COLOR_MAP["S"] + "Skipped:\n#{klass}##{meth} (#{id})" + ::Termin::ANSIColor.reset + " [#{location e}]:\n#{e.message}\n"]
           when MiniTest::Assertion then
             @failures += 1
             results.failure_count += 1
-            ["F", COLOR_MAP["F"] + "Failure:\n#{klass}##{meth} (#{id})" + ::Term::ANSIColor.reset + " [#{location e}]:\n#{e.message}\n"]
+            ["F", COLOR_MAP["F"] + "Failure:\n#{klass}##{meth} (#{id})" + ::Termin::ANSIColor.reset + " [#{location e}]:\n#{e.message}\n"]
           else
             @errors += 1
             results.error_count += 1
@@ -224,7 +224,7 @@ module TConsole
             filtered_backtrace = Util.filter_backtrace(e.backtrace)
             backtrace_text = MiniTest::filter_backtrace(filtered_backtrace).join "\n    "
 
-            ["E", COLOR_MAP["E"] + "Error:\n#{klass}##{meth} (#{id}):\n" + ::Term::ANSIColor.reset + "#{e.class}: #{e.message}\n    #{backtrace_text}\n"]
+            ["E", COLOR_MAP["E"] + "Error:\n#{klass}##{meth} (#{id}):\n" + ::Termin::ANSIColor.reset + "#{e.class}: #{e.message}\n    #{backtrace_text}\n"]
           end
       @report << e[1]
       e[0]
@@ -233,4 +233,4 @@ module TConsole
 end
 
 # Make sure that output is only colored when it should be
-Term::ANSIColor::coloring = STDOUT.isatty
+Termin::ANSIColor::coloring = STDOUT.isatty

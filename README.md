@@ -1,6 +1,12 @@
 TConsole
 ======
 
+> **NOTE:** TConsole isn't compatible with the latest version of
+> MiniTest, and (very sadly) I don't have enough free time to devote to
+> it at the moment. It's a wonderful tool though, so I've every
+> intention of getting it back up and running at some point.  
+>   -- Graham Ashton
+
 TConsole is a testing console for Rails. It allows you to issue commands
 concerning what tests to run, and see their test output. It's also got a
 helpful reload command for when your Rails environment needs to be
